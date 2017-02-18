@@ -10,8 +10,8 @@ import com.smilehacker.lego.LegoAdapter;
 
 public class TestAdapter extends LegoAdapter {
     public TestAdapter(Context context) {
-
         Item0Component item0 = new Item0Component(context);
         register(item0);
     }
+
 }

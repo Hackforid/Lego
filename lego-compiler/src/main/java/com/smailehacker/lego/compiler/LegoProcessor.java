@@ -2,6 +2,7 @@ package com.smailehacker.lego.compiler;
 
 import com.google.auto.service.AutoService;
 import com.smilehacker.lego.annotation.Component;
+import com.smilehacker.lego.annotation.LegoIndex;
 
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
@@ -18,6 +19,7 @@ import javax.lang.model.SourceVersion;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.TypeElement;
+import javax.lang.model.element.VariableElement;
 import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
 import javax.tools.Diagnostic;
@@ -51,7 +53,19 @@ public class LegoProcessor extends AbstractProcessor {
             ComponentAnnotatedClass componentAnnotatedClass = new ComponentAnnotatedClass(element);
             componentAnnotatedClassList.add(componentAnnotatedClass);
         }
-        FileMaker.make(filer, componentAnnotatedClassList);
+
+        List<VariableElement> indexList = new LinkedList<>();
+        for (Element annotatedElement: roundEnvironment.getElementsAnnotatedWith(LegoIndex.class)) {
+            if (annotatedElement.getKind() != ElementKind.FIELD) {
+                error(annotatedElement, "Only field can be annotated with @%s", Component.class.getSimpleName());
+                return true;
+            }
+            VariableElement element = (VariableElement) annotatedElement;
+            indexList.add(element);
+        }
+
+
+        FileMaker.makeComponentFactory(filer, componentAnnotatedClassList, indexList);
         return false;
     }
 
@@ -64,6 +78,7 @@ public class LegoProcessor extends AbstractProcessor {
     public Set<String> getSupportedAnnotationTypes() {
         Set<String> annotations = new LinkedHashSet<>();
         annotations.add(Component.class.getCanonicalName());
+        annotations.add(LegoIndex.class.getCanonicalName());
         return annotations;
     }
 

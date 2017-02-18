@@ -11,6 +11,9 @@ import java.util.List;
 
 import javax.annotation.processing.Filer;
 import javax.lang.model.element.Modifier;
+import javax.lang.model.element.TypeElement;
+import javax.lang.model.element.VariableElement;
+import javax.lang.model.type.TypeMirror;
 
 
 /**
@@ -19,7 +22,7 @@ import javax.lang.model.element.Modifier;
 
 public class FileMaker {
 
-    public static void make(Filer filer, List<ComponentAnnotatedClass> classList) {
+    public static void makeComponentFactory(Filer filer, List<ComponentAnnotatedClass> classList, List<VariableElement> indexEles) {
         TypeSpec.Builder codeBuilder = TypeSpec.classBuilder("LegoFactory");
         codeBuilder.addModifiers(Modifier.PUBLIC, Modifier.FINAL);
         TypeName legoComponentClassName = ClassName.get("com.smilehacker.lego", "LegoComponent");
@@ -39,11 +42,32 @@ public class FileMaker {
                 .addStatement("return null");
 
         codeBuilder.addMethod(methodBuilder.build());
+        codeBuilder.addMethod(getIndexMethod(indexEles));
         JavaFile javaFile = JavaFile.builder("com.smilehacker.lego", codeBuilder.build()).build();
         try {
             javaFile.writeTo(filer);
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    private static MethodSpec getIndexMethod(List<VariableElement> elements) {
+        TypeName legoModelClassName = ClassName.get("com.smilehacker.lego", "LegoModel");
+
+        MethodSpec.Builder builder = MethodSpec.methodBuilder("getModelIndex")
+                .addParameter(legoModelClassName, "model")
+                .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
+                .returns(Object.class);
+
+        for (VariableElement element: elements) {
+            TypeMirror fieldType = element.asType();
+            TypeElement parent = (TypeElement) element.getEnclosingElement();
+            builder.beginControlFlow("if ($T.class.equals(model.getClass()))", parent)
+                    .addStatement("return (($T) model).$N", parent, element.getSimpleName())
+                    .endControlFlow();
+        }
+        builder.addStatement("return null");
+
+        return builder.build();
     }
 }

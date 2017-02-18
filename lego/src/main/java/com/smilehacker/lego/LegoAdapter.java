@@ -30,13 +30,13 @@ public class LegoAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     // TODO add data diff
     public void setData(List<com.smilehacker.lego.LegoModel> models) {
-        mModels.clear();
-        mModels.addAll(models);
-        notifyDataSetChanged();
+        diffNotifyDataSetChanged(models);
     }
 
-    public void appendData(List<com.smilehacker.lego.LegoModel> models) {
-        models.addAll(models);
+
+    public void diffNotifyDataSetChanged(List<LegoModel> newList) {
+        mModels.clear();
+        mModels.addAll(newList);
         notifyDataSetChanged();
     }
 
