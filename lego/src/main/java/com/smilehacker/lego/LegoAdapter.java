@@ -103,6 +103,7 @@ public class LegoAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         return viewModel.getClass().hashCode();
     }
 
+    @SuppressWarnings("unchecked")
     private static Method init() {
         Class factoryClass;
         try {
