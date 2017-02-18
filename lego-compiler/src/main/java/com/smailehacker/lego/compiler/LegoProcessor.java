@@ -6,8 +6,6 @@ import com.smilehacker.lego.annotation.LegoField;
 import com.smilehacker.lego.annotation.LegoIndex;
 
 import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Set;
 
 import javax.annotation.processing.AbstractProcessor;
@@ -18,9 +16,7 @@ import javax.annotation.processing.Processor;
 import javax.annotation.processing.RoundEnvironment;
 import javax.lang.model.SourceVersion;
 import javax.lang.model.element.Element;
-import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.TypeElement;
-import javax.lang.model.element.VariableElement;
 import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
 import javax.tools.Diagnostic;
@@ -44,29 +40,8 @@ public class LegoProcessor extends AbstractProcessor {
 
     @Override
     public boolean process(Set<? extends TypeElement> set, RoundEnvironment roundEnvironment) {
-        List<ComponentAnnotatedClass> componentAnnotatedClassList = new LinkedList<>();
-        for (Element annotatedElement: roundEnvironment.getElementsAnnotatedWith(Component.class)) {
-            if (annotatedElement.getKind() != ElementKind.CLASS) {
-                error(annotatedElement, "Only classes can be annotated with @%s", Component.class.getSimpleName());
-                return true;
-            }
-            TypeElement element = (TypeElement) annotatedElement;
-            ComponentAnnotatedClass componentAnnotatedClass = new ComponentAnnotatedClass(element);
-            componentAnnotatedClassList.add(componentAnnotatedClass);
-        }
 
-        List<VariableElement> indexList = new LinkedList<>();
-        for (Element annotatedElement: roundEnvironment.getElementsAnnotatedWith(LegoIndex.class)) {
-            if (annotatedElement.getKind() != ElementKind.FIELD) {
-                error(annotatedElement, "Only field can be annotated with @%s", Component.class.getSimpleName());
-                return true;
-            }
-            VariableElement element = (VariableElement) annotatedElement;
-            indexList.add(element);
-        }
-
-
-        FileMaker.makeComponentFactory(filer, componentAnnotatedClassList, indexList);
+        new FileMaker().make(filer, messager, roundEnvironment);
         return false;
     }
 

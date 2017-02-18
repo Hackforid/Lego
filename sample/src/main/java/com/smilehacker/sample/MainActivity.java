@@ -5,6 +5,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
 
 import com.smilehacker.lego.LegoModel;
 
@@ -15,12 +17,14 @@ public class MainActivity extends AppCompatActivity {
 
     private RecyclerView mRv;
     private TestAdapter mAdapter;
+    private Button mBtn;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         mRv = (RecyclerView) findViewById(R.id.rv);
+        mBtn = (Button) findViewById(R.id.btn_refresh);
         mAdapter = new TestAdapter(this);
 
         mRv.setAdapter(mAdapter);
@@ -28,6 +32,13 @@ public class MainActivity extends AppCompatActivity {
 
         loadData();
         test(new Item0Component.Model1());
+
+        mBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                loadData();
+            }
+        });
     }
 
     private void loadData() {
@@ -35,6 +46,7 @@ public class MainActivity extends AppCompatActivity {
         for (int i = 0; i < 30; i++) {
             Item0Component.Model model = new Item0Component.Model();
             model.title = String.format("item %d", i);
+            model.content = i;
             models.add(model);
         }
         mAdapter.setData(models);
