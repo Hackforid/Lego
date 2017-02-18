@@ -43,7 +43,7 @@ public class LegoAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         for (com.smilehacker.lego.LegoComponent component: mComponents) {
-            if (component.hashCode() == viewType) {
+            if (component.getClass().hashCode() == viewType) {
                 return component.getViewHolder(parent);
             }
         }
@@ -88,7 +88,7 @@ public class LegoAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     public int getItemViewType(int position) {
         com.smilehacker.lego.LegoModel dataModel = mModels.get(position);
         com.smilehacker.lego.LegoComponent viewModel = getViewModelByModel(dataModel);
-        return viewModel.hashCode();
+        return viewModel.getClass().hashCode();
     }
 
     private static Method init() {

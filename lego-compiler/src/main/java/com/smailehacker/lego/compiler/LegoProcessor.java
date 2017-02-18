@@ -2,6 +2,7 @@ package com.smailehacker.lego.compiler;
 
 import com.google.auto.service.AutoService;
 import com.smilehacker.lego.annotation.Component;
+import com.smilehacker.lego.annotation.LegoField;
 import com.smilehacker.lego.annotation.LegoIndex;
 
 import java.util.LinkedHashSet;
@@ -79,6 +80,7 @@ public class LegoProcessor extends AbstractProcessor {
         Set<String> annotations = new LinkedHashSet<>();
         annotations.add(Component.class.getCanonicalName());
         annotations.add(LegoIndex.class.getCanonicalName());
+        annotations.add(LegoField.class.getCanonicalName());
         return annotations;
     }
 
