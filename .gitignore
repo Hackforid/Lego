@@ -16,6 +16,5 @@ build/
 *.apk
 *.hprof
 gradle/
-gradlew
 gradlew.bat
 infer-out/
