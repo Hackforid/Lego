@@ -8,13 +8,17 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 
+import com.smilehacker.lego.ILegoFactory;
+import com.smilehacker.lego.LegoFactory;
 import com.smilehacker.lego.LegoModel;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.LinkedList;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
+    private static final String TAG = MainActivity.class.getSimpleName();
     private RecyclerView mRv;
     private TestAdapter mAdapter;
     private Button mBtn;
@@ -36,7 +40,14 @@ public class MainActivity extends AppCompatActivity {
         mBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                loadData();
+                //loadData();
+                try {
+                    test1();
+                } catch (InvocationTargetException e) {
+                    e.printStackTrace();
+                } catch (IllegalAccessException e) {
+                    e.printStackTrace();
+                }
             }
         });
     }
@@ -56,5 +67,31 @@ public class MainActivity extends AppCompatActivity {
         if (model.getClass().equals(Item0Component.Model.class)) {
             Log.i("aa", "equal");
         }
+
+
+    }
+
+    private void test1() throws InvocationTargetException, IllegalAccessException {
+        Item0Component.Model model = new Item0Component.Model();
+        model.title = String.format("item %d", 1);
+        model.content = 1;
+
+        long now = System.currentTimeMillis();
+        ILegoFactory legoFactory = new LegoFactory();
+        for (int i = 0; i < 1000000; i++) {
+            legoFactory.getModelIndex(model);
+        }
+
+        Log.i(TAG, "native cost=" +(System.currentTimeMillis() - now));
+
+
+
+        now = System.currentTimeMillis();
+        legoFactory = TestAdapter.legoFactory;
+        for (int i = 0; i < 1000000; i++) {
+            legoFactory.getModelIndex(model);
+        }
+        Log.i(TAG, "reflect cost=" +(System.currentTimeMillis() - now));
+
     }
 }

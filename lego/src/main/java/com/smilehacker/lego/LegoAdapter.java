@@ -6,6 +6,7 @@ import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.ViewGroup;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
@@ -21,9 +22,7 @@ public class LegoAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private List<com.smilehacker.lego.LegoComponent> mComponents = new ArrayList<>();
     private List<com.smilehacker.lego.LegoModel> mModels = new ArrayList<>();
 
-    private static Method getModelClass;
-    private static Method getModelIndex;
-    private static Method isModelEquals;
+    public static ILegoFactory legoFactory;
 
     private DiffCallback mDiffCallback = new DiffCallback();
 
@@ -54,7 +53,7 @@ public class LegoAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        for (com.smilehacker.lego.LegoComponent component: mComponents) {
+        for (LegoComponent component : mComponents) {
             if (component.getClass().hashCode() == viewType) {
                 return component.getViewHolder(parent);
             }
@@ -64,27 +63,19 @@ public class LegoAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
-        com.smilehacker.lego.LegoModel model = mModels.get(position);
-        com.smilehacker.lego.LegoComponent viewModel = getViewModelByModel(model);
-        if (viewModel == null) {
-            return;
-        }
+        LegoModel model = mModels.get(position);
+        LegoComponent viewModel = getViewModelByModel(model);
         //noinspection unchecked
         viewModel.onBindData(holder, model);
     }
 
 
-
     @NonNull
-    private com.smilehacker.lego.LegoComponent getViewModelByModel(com.smilehacker.lego.LegoModel dataModel) {
-        for (com.smilehacker.lego.LegoComponent component: mComponents) {
-            try {
-                Class modelClass = (Class) getModelClass.invoke(this, component);
-                if (dataModel.getClass().equals(modelClass)) {
-                    return component;
-                }
-            } catch (Exception e) {
-                Log.e(TAG, "method error", e);
+    private LegoComponent getViewModelByModel(com.smilehacker.lego.LegoModel dataModel) {
+        for (LegoComponent component : mComponents) {
+            Class modelClass = legoFactory.getModelClass(component);
+            if (dataModel.getClass().equals(modelClass)) {
+                return component;
             }
         }
         return null;
@@ -108,9 +99,8 @@ public class LegoAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         Class factoryClass;
         try {
             factoryClass = Class.forName("com.smilehacker.lego.LegoFactory");
-            getModelClass = factoryClass.getDeclaredMethod("getModelClass", LegoComponent.class);
-            getModelIndex = factoryClass.getDeclaredMethod("getModelIndex", LegoModel.class);
-            isModelEquals = factoryClass.getDeclaredMethod("isModelEquals", LegoModel.class, LegoModel.class);
+            Constructor<?> constructor = factoryClass.getDeclaredConstructor();
+            legoFactory = (ILegoFactory) constructor.newInstance();
         } catch (Exception e) {
             Log.e(TAG, "method error", e);
         }
@@ -144,15 +134,10 @@ public class LegoAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         public boolean areItemsTheSame(int oldItemPosition, int newItemPosition) {
             LegoModel oldModel = mOldModels.get(oldItemPosition);
             LegoModel newModel = mNewModels.get(newItemPosition);
-            try {
-                Object oldIndex = getModelIndex.invoke(this, oldModel);
-                Object newIndex = getModelIndex.invoke(this, newModel);
-                if (oldIndex != null && newIndex != null && oldIndex.equals(newIndex)) {
-                    return true;
-                }
-            } catch (Exception e) {
-                Log.e(TAG, "method error", e);
-                return false;
+            Object oldIndex = legoFactory.getModelIndex(oldModel);
+            Object newIndex = legoFactory.getModelIndex(newModel);
+            if (oldIndex != null && newIndex != null && oldIndex.equals(newIndex)) {
+                return true;
             }
             return false;
         }
@@ -161,20 +146,14 @@ public class LegoAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         public boolean areContentsTheSame(int oldItemPosition, int newItemPosition) {
             LegoModel oldModel = mOldModels.get(oldItemPosition);
             LegoModel newModel = mNewModels.get(newItemPosition);
-            try {
-                int r = (int) isModelEquals.invoke(this, oldModel, newModel);
-                if (r == -1) {
-                    return false;
-                } else if (r == 1) {
-                    return true;
-                } else {
-                    return oldModel.equals(newModel);
-                }
-            } catch (Exception e) {
-                Log.e(TAG, "method error", e);
+            int r = legoFactory.isModelEquals(oldModel, newModel);
+            if (r == -1) {
                 return false;
+            } else if (r == 1) {
+                return true;
+            } else {
+                return oldModel.equals(newModel);
             }
-
         }
     }
 }

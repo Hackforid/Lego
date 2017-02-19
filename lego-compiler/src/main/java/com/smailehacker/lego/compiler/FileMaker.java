@@ -39,8 +39,11 @@ public class FileMaker {
     public void make(Filer filer, Messager message, RoundEnvironment roundEnvironment) {
         this.messager = message;
 
+        TypeName ILegoFactoryName = ClassName.get("com.smilehacker.lego", "ILegoFactory");
+
         TypeSpec.Builder codeBuilder = TypeSpec.classBuilder("LegoFactory");
         codeBuilder.addModifiers(Modifier.PUBLIC, Modifier.FINAL);
+        codeBuilder.addSuperinterface(ILegoFactoryName);
         codeBuilder.addMethod(getModelMethod(roundEnvironment));
         codeBuilder.addMethod(getModelIndexMethod(roundEnvironment));
         codeBuilder.addMethod(getMethodModelEquals(roundEnvironment));
@@ -57,7 +60,8 @@ public class FileMaker {
         TypeName legoComponentClassName = ClassName.get("com.smilehacker.lego", "LegoComponent");
         MethodSpec.Builder methodBuilder = MethodSpec.methodBuilder("getModelClass")
                 .addParameter(legoComponentClassName, "component")
-                .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
+                .addModifiers(Modifier.PUBLIC)
+                .addAnnotation(Override.class)
                 .returns(Class.class);
 
         for (Element annotatedElement: roundEnvironment.getElementsAnnotatedWith(Component.class)) {
@@ -83,7 +87,8 @@ public class FileMaker {
 
         MethodSpec.Builder builder = MethodSpec.methodBuilder("getModelIndex")
                 .addParameter(legoModelClassName, "model")
-                .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
+                .addModifiers(Modifier.PUBLIC)
+                .addAnnotation(Override.class)
                 .returns(Object.class);
 
         for (Element annotatedElement: roundEnvironment.getElementsAnnotatedWith(LegoIndex.class)) {
@@ -107,7 +112,8 @@ public class FileMaker {
         MethodSpec.Builder builder = MethodSpec.methodBuilder("isModelEquals")
                 .addParameter(legoModelClassName, "model0")
                 .addParameter(legoModelClassName, "model1")
-                .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
+                .addModifiers(Modifier.PUBLIC)
+                .addAnnotation(Override.class)
                 .returns(int.class);
         builder.beginControlFlow("if (!model0.getClass().equals(model1.getClass()))");
         builder.addStatement("return -1");
