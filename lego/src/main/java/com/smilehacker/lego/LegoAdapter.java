@@ -25,6 +25,7 @@ public class LegoAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     public static ILegoFactory legoFactory;
 
     private boolean mDiffUtilEnabled = false;
+    private boolean mDiffUtilDetectMoves = true;
 
     private DiffCallback mDiffCallback = new DiffCallback();
 
@@ -60,11 +61,14 @@ public class LegoAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         mDiffUtilEnabled = enable;
     }
 
+    public void setDiffUtilDetectMoves(boolean detectMoves) {
+        mDiffUtilDetectMoves = detectMoves;
+    }
 
     private void diffNotifyDataSetChanged(List<LegoModel> newList) {
         mDiffCallback.setOldModels(mModels);
         mDiffCallback.setNewModels(newList);
-        DiffUtil.DiffResult result = DiffUtil.calculateDiff(mDiffCallback, true);
+        DiffUtil.DiffResult result = DiffUtil.calculateDiff(mDiffCallback, mDiffUtilDetectMoves);
         result.dispatchUpdatesTo(this);
     }
 
@@ -163,14 +167,7 @@ public class LegoAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         public boolean areContentsTheSame(int oldItemPosition, int newItemPosition) {
             LegoModel oldModel = mOldModels.get(oldItemPosition);
             LegoModel newModel = mNewModels.get(newItemPosition);
-            int r = legoFactory.isModelEquals(oldModel, newModel);
-            if (r == -1) {
-                return false;
-            } else if (r == 1) {
-                return true;
-            } else {
-                return oldModel.equals(newModel);
-            }
+            return legoFactory.isModelEquals(oldModel, newModel);
         }
     }
 }

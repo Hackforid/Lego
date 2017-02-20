@@ -13,6 +13,8 @@ import com.smilehacker.lego.annotation.Component;
 import com.smilehacker.lego.annotation.LegoField;
 import com.smilehacker.lego.annotation.LegoIndex;
 
+import java.util.List;
+
 /**
  * Created by zhouquan on 17/2/18.
  */
@@ -52,10 +54,26 @@ public class Item0Component extends LegoComponent<Item0Component.ViewHolder, Ite
         public String title;
 
         @LegoIndex
-        @LegoField
         public int content;
+
+        @LegoField
+        public List<String> a;
+
+        @LegoField
+        public int[] b;
     }
+
     public static class Model1 implements LegoModel {
-        public String title;
+
+        @LegoField
+        public int[] title;
+
+        @LegoField
+        public Model2 model2;
+    }
+
+    public static class Model2 {
+        @LegoField
+        public String a;
     }
 }

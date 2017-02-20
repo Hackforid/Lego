@@ -8,12 +8,10 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 
-import com.smilehacker.lego.ILegoFactory;
 import com.smilehacker.lego.LegoFactory;
 import com.smilehacker.lego.LegoModel;
 
-import java.lang.reflect.InvocationTargetException;
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
@@ -35,63 +33,42 @@ public class MainActivity extends AppCompatActivity {
         mRv.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
 
         loadData();
-        test(new Item0Component.Model1());
 
         mBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //loadData();
-                try {
-                    test1();
-                } catch (InvocationTargetException e) {
-                    e.printStackTrace();
-                } catch (IllegalAccessException e) {
-                    e.printStackTrace();
-                }
+                loadData();
             }
         });
     }
 
+
     private void loadData() {
-        List<LegoModel> models = new LinkedList<>();
+        List<LegoModel> models = new ArrayList<>();
         for (int i = 0; i < 30; i++) {
             Item0Component.Model model = new Item0Component.Model();
             model.title = String.format("item %d", i);
             model.content = i;
+            model.b = new int[] {1,2};
+            model.a = new ArrayList<>();
+            model.a.add("aa");
+            model.a.add("bb");
             models.add(model);
         }
+        LegoFactory factory = new LegoFactory();
+        factory.isModelEquals(models, mAdapter.getData());
         mAdapter.commitData(models);
+
+        Item0Component.Model1 a = new Item0Component.Model1();
+        a.model2 = new Item0Component.Model2();
+        a.model2.a = "a";
+
+        Item0Component.Model1 b = new Item0Component.Model1();
+        b.model2 = new Item0Component.Model2();
+        b.model2.a = "aa";
+
+        Log.d(TAG, "is equals " + factory.isModelEquals(a, b));
     }
 
-    private void test(LegoModel model) {
-        if (model.getClass().equals(Item0Component.Model.class)) {
-            Log.i("aa", "equal");
-        }
 
-
-    }
-
-    private void test1() throws InvocationTargetException, IllegalAccessException {
-        Item0Component.Model model = new Item0Component.Model();
-        model.title = String.format("item %d", 1);
-        model.content = 1;
-
-        long now = System.currentTimeMillis();
-        ILegoFactory legoFactory = new LegoFactory();
-        for (int i = 0; i < 10000000; i++) {
-            legoFactory.getModelIndex(model);
-        }
-
-        Log.i(TAG, "native cost=" +(System.currentTimeMillis() - now));
-
-
-
-        now = System.currentTimeMillis();
-        legoFactory = TestAdapter.legoFactory;
-        for (int i = 0; i < 10000000; i++) {
-            legoFactory.getModelIndex(model);
-        }
-        Log.i(TAG, "reflect cost=" +(System.currentTimeMillis() - now));
-
-    }
 }
