@@ -60,7 +60,7 @@ public class MainActivity extends AppCompatActivity {
             model.content = i;
             models.add(model);
         }
-        mAdapter.setData(models);
+        mAdapter.commitData(models);
     }
 
     private void test(LegoModel model) {
@@ -78,7 +78,7 @@ public class MainActivity extends AppCompatActivity {
 
         long now = System.currentTimeMillis();
         ILegoFactory legoFactory = new LegoFactory();
-        for (int i = 0; i < 1000000; i++) {
+        for (int i = 0; i < 10000000; i++) {
             legoFactory.getModelIndex(model);
         }
 
@@ -88,7 +88,7 @@ public class MainActivity extends AppCompatActivity {
 
         now = System.currentTimeMillis();
         legoFactory = TestAdapter.legoFactory;
-        for (int i = 0; i < 1000000; i++) {
+        for (int i = 0; i < 10000000; i++) {
             legoFactory.getModelIndex(model);
         }
         Log.i(TAG, "reflect cost=" +(System.currentTimeMillis() - now));

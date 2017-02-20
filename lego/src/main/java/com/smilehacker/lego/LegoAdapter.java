@@ -24,6 +24,8 @@ public class LegoAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     public static ILegoFactory legoFactory;
 
+    private boolean mDiffUtilEnabled = false;
+
     private DiffCallback mDiffCallback = new DiffCallback();
 
     {
@@ -31,24 +33,39 @@ public class LegoAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     }
 
 
-    public void register(com.smilehacker.lego.LegoComponent component) {
+    public void register(LegoComponent component) {
         mComponents.add(component);
     }
 
-    // TODO add data diff
-    public void setData(List<com.smilehacker.lego.LegoModel> models) {
-        diffNotifyDataSetChanged(models);
+    public void setData(List<LegoModel> models) {
+        mModels.clear();
+        mModels.addAll(models);
+    }
+
+    public List<LegoModel> getData() {
+        return mModels;
+    }
+
+    public void commitData(List<LegoModel> models) {
+        if (mDiffUtilEnabled) {
+            diffNotifyDataSetChanged(models);
+            setData(models);
+        } else {
+            setData(models);
+            notifyDataSetChanged();
+        }
+    }
+
+    public void setDiffUtilEnabled(boolean enable) {
+        mDiffUtilEnabled = enable;
     }
 
 
-    public void diffNotifyDataSetChanged(List<LegoModel> newList) {
+    private void diffNotifyDataSetChanged(List<LegoModel> newList) {
         mDiffCallback.setOldModels(mModels);
         mDiffCallback.setNewModels(newList);
         DiffUtil.DiffResult result = DiffUtil.calculateDiff(mDiffCallback, true);
         result.dispatchUpdatesTo(this);
-
-        mModels.clear();
-        mModels.addAll(newList);
     }
 
     @Override
