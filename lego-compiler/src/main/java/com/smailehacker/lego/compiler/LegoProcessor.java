@@ -41,7 +41,7 @@ public class LegoProcessor extends AbstractProcessor {
     @Override
     public boolean process(Set<? extends TypeElement> set, RoundEnvironment roundEnvironment) {
 
-        new FileMaker().make(filer, messager, roundEnvironment);
+        new FileMaker(typeUtils, elementUtils, messager).make(filer, roundEnvironment);
         return false;
     }
 

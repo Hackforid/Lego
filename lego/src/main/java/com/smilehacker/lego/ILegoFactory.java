@@ -10,5 +10,5 @@ public interface ILegoFactory {
 
     Object getModelIndex(LegoModel model);
 
-    int isModelEquals(LegoModel model0, LegoModel model1);
+    boolean isModelEquals(Object model0, Object model1);
 }

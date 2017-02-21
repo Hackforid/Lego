@@ -10,6 +10,7 @@ import com.squareup.javapoet.TypeName;
 import com.squareup.javapoet.TypeSpec;
 
 import java.io.IOException;
+import java.lang.reflect.Array;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -26,6 +27,8 @@ import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.DeclaredType;
 import javax.lang.model.type.TypeMirror;
+import javax.lang.model.util.Elements;
+import javax.lang.model.util.Types;
 import javax.tools.Diagnostic;
 
 
@@ -34,11 +37,17 @@ import javax.tools.Diagnostic;
  */
 
 public class FileMaker {
-    private Messager messager;
+    private Messager mMessager;
+    private Elements mElements;
+    private Types mTypes;
 
-    public void make(Filer filer, Messager message, RoundEnvironment roundEnvironment) {
-        this.messager = message;
+    public FileMaker(Types types, Elements elements, Messager messager) {
+        mTypes = types;
+        mElements = elements;
+        mMessager = messager;
+    }
 
+    public void make(Filer filer, RoundEnvironment roundEnvironment) {
         TypeName ILegoFactoryName = ClassName.get("com.smilehacker.lego", "ILegoFactory");
 
         TypeSpec.Builder codeBuilder = TypeSpec.classBuilder("LegoFactory");
@@ -64,6 +73,7 @@ public class FileMaker {
                 .addAnnotation(Override.class)
                 .returns(Class.class);
 
+        boolean isCheckStart = false;
         for (Element annotatedElement: roundEnvironment.getElementsAnnotatedWith(Component.class)) {
             if (annotatedElement.getKind() != ElementKind.CLASS) {
                 error(annotatedElement, "Only classes can be annotated with @%s", Component.class.getSimpleName());
@@ -72,10 +82,21 @@ public class FileMaker {
             TypeElement element = (TypeElement) annotatedElement;
             DeclaredType declaredType = (DeclaredType) element.getSuperclass();
             TypeMirror modelTypeMirror = declaredType.getTypeArguments().get(1);
+            if (!isCheckStart) {
+                isCheckStart = true;
+                methodBuilder
+                        .beginControlFlow("if (component.getClass().equals($T.class))", element);
+            } else {
+                methodBuilder
+                        .nextControlFlow("else if (component.getClass().equals($T.class))", element);
+            }
+
+
             methodBuilder
-                    .beginControlFlow("if (component.getClass().equals($T.class))", element)
-                    .addStatement("return $T.class", modelTypeMirror)
-                    .endControlFlow();
+                    .addStatement("return $T.class", modelTypeMirror);
+        }
+        if (isCheckStart) {
+            methodBuilder.endControlFlow();
         }
         methodBuilder
                 .addStatement("return null");
@@ -91,6 +112,7 @@ public class FileMaker {
                 .addAnnotation(Override.class)
                 .returns(Object.class);
 
+        boolean isCheckStart = false;
         for (Element annotatedElement: roundEnvironment.getElementsAnnotatedWith(LegoIndex.class)) {
             if (annotatedElement.getKind() != ElementKind.FIELD) {
                 error(annotatedElement, "Only field can be annotated with @%s", LegoIndex.class.getSimpleName());
@@ -98,15 +120,24 @@ public class FileMaker {
             }
             VariableElement element = (VariableElement) annotatedElement;
             TypeElement parent = (TypeElement) element.getEnclosingElement();
-            builder.beginControlFlow("if ($T.class.equals(model.getClass()))", parent)
-                    .addStatement("return (($T) model).$N", parent, element.getSimpleName())
-                    .endControlFlow();
+            if (!isCheckStart) {
+                isCheckStart = true;
+                builder.beginControlFlow("if ($T.class.equals(model.getClass()))", parent);
+            } else {
+                builder.nextControlFlow("else if ($T.class.equals(model.getClass()))", parent);
+            }
+            builder
+                    .addStatement("return (($T) model).$N", parent, element.getSimpleName());
+        }
+        if (isCheckStart) {
+            builder.endControlFlow();
         }
         builder.addStatement("return null");
         return builder.build();
     }
 
-    private MethodSpec getMethodModelEquals(RoundEnvironment roundEnvironment) {
+
+    private MethodSpec getaMethodModelEquals(RoundEnvironment roundEnvironment) {
         TypeName legoModelClassName = ClassName.get("com.smilehacker.lego", "LegoModel");
 
         MethodSpec.Builder builder = MethodSpec.methodBuilder("isModelEquals")
@@ -175,15 +206,120 @@ public class FileMaker {
         }
     }
 
+    private MethodSpec getMethodModelEquals(RoundEnvironment roundEnvironment) {
+        MethodSpec.Builder builder = MethodSpec.methodBuilder("isModelEquals")
+                .addParameter(Object.class, "model0")
+                .addParameter(Object.class, "model1")
+                .addModifiers(Modifier.PUBLIC)
+                .addAnnotation(Override.class)
+                .returns(boolean.class);
+
+        builder.beginControlFlow("if (model0 == model1)");
+        builder.addStatement("return true");
+        builder.endControlFlow();
+
+        builder.beginControlFlow("if (model0 == null && model1 == null)");
+        builder.addStatement("return true");
+        builder.nextControlFlow("else if (model0 == null || model1 == null)");
+        builder.addStatement("return false");
+        builder.endControlFlow();
+
+        builder.beginControlFlow("if (!model0.getClass().equals(model1.getClass()))");
+        builder.addStatement("return false");
+        builder.endControlFlow();
+
+        // if object is List
+        builder.beginControlFlow("if (model0 instanceof $T)", List.class);
+            builder.addStatement("$T m0 = ($T) model0", List.class, List.class);
+            builder.addStatement("$T m1 = ($T) model1", List.class, List.class);
+            builder.beginControlFlow("if (m0.size() != m1.size())");
+                builder.addStatement("return false");
+            builder.nextControlFlow("else");
+                builder.beginControlFlow("for(int i = 0, len = m0.size(); i < len; i++)");
+                    builder.beginControlFlow("if (!isModelEquals(m0.get(i), m1.get(i)))");
+                        builder.addStatement("return false");
+                    builder.endControlFlow();
+                    builder.addStatement("return true");
+                builder.endControlFlow();
+            builder.endControlFlow();
+        builder.endControlFlow();
+
+        // if object is Array
+        builder.beginControlFlow("if (model0.getClass().isArray())");
+            builder.addStatement("int len0 = $T.getLength(model0), len1 = $T.getLength(model1)", Array.class, Array.class);
+            builder.beginControlFlow("if (len0 != len1)");
+                builder.addStatement("return false");
+            builder.nextControlFlow("else");
+                builder.beginControlFlow("for(int i = 0; i < len0; i++)");
+                    builder.beginControlFlow("if (!isModelEquals($T.get(model0, i), $T.get(model1, i)))", Array.class, Array.class);
+                        builder.addStatement("return false");
+                    builder.endControlFlow();
+                    builder.addStatement("return true");
+                builder.endControlFlow();
+            builder.endControlFlow();
+        builder.endControlFlow();
+
+        HashMap<TypeElement, List<VariableElement>> fieldMap = new HashMap<>();
+        for (Element annotatedElement: roundEnvironment.getElementsAnnotatedWith(LegoField.class)) {
+            if (annotatedElement.getKind() != ElementKind.FIELD) {
+                error(annotatedElement, "Only field can be annotated with @%s", LegoField.class.getSimpleName());
+                return null;
+            }
+            VariableElement element = (VariableElement) annotatedElement;
+            TypeElement parent = (TypeElement) element.getEnclosingElement();
+
+            List<VariableElement> list = fieldMap.get(parent);
+            if (list == null) {
+                list = new LinkedList<>();
+                fieldMap.put(parent, list);
+            }
+            list.add(element);
+        }
+
+        boolean isGenerateIf = false;
+        for (Map.Entry<TypeElement, List<VariableElement>> entry: fieldMap.entrySet()) {
+            TypeElement parent = entry.getKey();
+            if (!isGenerateIf) {
+                isGenerateIf = true;
+                builder.beginControlFlow("if ($T.class.equals(model0.getClass()))", parent);
+            } else {
+                builder.nextControlFlow("else if ($T.class.equals(model0.getClass()))", parent);
+            }
+            builder.addStatement("$T m0 = ($T) model0", parent, parent);
+            builder.addStatement("$T m1 = ($T) model1", parent, parent);
+
+            for (VariableElement element: entry.getValue()) {
+                Name name = element.getSimpleName();
+                if (isPrimaryField(element)) {
+                    builder.beginControlFlow("if (m0.$N != m1.$N)", name, name);
+                    builder.addStatement("return false");
+                    builder.endControlFlow();
+                } else {
+                    builder.beginControlFlow("if (!isModelEquals(m0.$N, m1.$N))", name, name);
+                    builder.addStatement("return false");
+                    builder.endControlFlow();
+                }
+            }
+            builder.addStatement("return true");
+        }
+        if (isGenerateIf) {
+            builder.endControlFlow();
+        }
+
+        // generate default equal
+        builder.addStatement("return model0.equals(model1)");
+        return builder.build();
+    }
+
     private void error(Element e, String msg, Object... args) {
-        messager.printMessage(
+        mMessager.printMessage(
                 Diagnostic.Kind.ERROR,
                 String.format(msg, args),
                 e);
     }
 
     private void log(Element e, String msg, Object... args) {
-        messager.printMessage(
+        mMessager.printMessage(
                 Diagnostic.Kind.NOTE,
                 String.format(msg, args),
                 e);

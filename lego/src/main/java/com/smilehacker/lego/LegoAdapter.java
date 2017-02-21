@@ -19,10 +19,13 @@ public class LegoAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     private static String TAG = LegoAdapter.class.getSimpleName();
 
-    private List<com.smilehacker.lego.LegoComponent> mComponents = new ArrayList<>();
-    private List<com.smilehacker.lego.LegoModel> mModels = new ArrayList<>();
+    private List<LegoComponent> mComponents = new ArrayList<>();
+    private List<LegoModel> mModels = new ArrayList<>();
 
     public static ILegoFactory legoFactory;
+
+    private boolean mDiffUtilEnabled = false;
+    private boolean mDiffUtilDetectMoves = true;
 
     private DiffCallback mDiffCallback = new DiffCallback();
 
@@ -31,30 +34,48 @@ public class LegoAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     }
 
 
-    public void register(com.smilehacker.lego.LegoComponent component) {
+    public void register(LegoComponent component) {
         mComponents.add(component);
     }
 
-    // TODO add data diff
-    public void setData(List<com.smilehacker.lego.LegoModel> models) {
-        diffNotifyDataSetChanged(models);
+    public void setData(List<LegoModel> models) {
+        mModels.clear();
+        mModels.addAll(models);
     }
 
+    public List<LegoModel> getData() {
+        return mModels;
+    }
 
-    public void diffNotifyDataSetChanged(List<LegoModel> newList) {
+    public void commitData(List<LegoModel> models) {
+        if (mDiffUtilEnabled) {
+            diffNotifyDataSetChanged(models);
+            setData(models);
+        } else {
+            setData(models);
+            notifyDataSetChanged();
+        }
+    }
+
+    public void setDiffUtilEnabled(boolean enable) {
+        mDiffUtilEnabled = enable;
+    }
+
+    public void setDiffUtilDetectMoves(boolean detectMoves) {
+        mDiffUtilDetectMoves = detectMoves;
+    }
+
+    private void diffNotifyDataSetChanged(List<LegoModel> newList) {
         mDiffCallback.setOldModels(mModels);
         mDiffCallback.setNewModels(newList);
-        DiffUtil.DiffResult result = DiffUtil.calculateDiff(mDiffCallback, true);
+        DiffUtil.DiffResult result = DiffUtil.calculateDiff(mDiffCallback, mDiffUtilDetectMoves);
         result.dispatchUpdatesTo(this);
-
-        mModels.clear();
-        mModels.addAll(newList);
     }
 
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         for (LegoComponent component : mComponents) {
-            if (component.getClass().hashCode() == viewType) {
+            if (component.getViewType() == viewType) {
                 return component.getViewHolder(parent);
             }
         }
@@ -91,7 +112,7 @@ public class LegoAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     public int getItemViewType(int position) {
         LegoModel dataModel = mModels.get(position);
         LegoComponent viewModel = getViewModelByModel(dataModel);
-        return viewModel.getClass().hashCode();
+        return viewModel.getViewType();
     }
 
     @SuppressWarnings("unchecked")
@@ -146,14 +167,7 @@ public class LegoAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         public boolean areContentsTheSame(int oldItemPosition, int newItemPosition) {
             LegoModel oldModel = mOldModels.get(oldItemPosition);
             LegoModel newModel = mNewModels.get(newItemPosition);
-            int r = legoFactory.isModelEquals(oldModel, newModel);
-            if (r == -1) {
-                return false;
-            } else if (r == 1) {
-                return true;
-            } else {
-                return oldModel.equals(newModel);
-            }
+            return legoFactory.isModelEquals(oldModel, newModel);
         }
     }
 }

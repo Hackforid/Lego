@@ -10,27 +10,24 @@ import android.widget.TextView;
 import com.smilehacker.lego.LegoComponent;
 import com.smilehacker.lego.LegoModel;
 import com.smilehacker.lego.annotation.Component;
-import com.smilehacker.lego.annotation.LegoField;
 import com.smilehacker.lego.annotation.LegoIndex;
 
-import java.util.List;
-
 /**
- * Created by zhouquan on 17/2/18.
+ * Created by kleist on 2017/2/21.
  */
 
 @Component
-public class Item0Component extends LegoComponent<Item0Component.ViewHolder, Item0Component.Model> {
+public class Item1Component extends LegoComponent<Item1Component.ViewHolder, Item1Component.Model> {
+
 
     private LayoutInflater mLayoutInflater;
 
-    public Item0Component(Context context) {
+    public Item1Component(Context context) {
         mLayoutInflater = LayoutInflater.from(context);
     }
-
     @Override
     protected ViewHolder getViewHolder(ViewGroup container) {
-        View view = mLayoutInflater.inflate(R.layout.item_v0, container, false);
+        View view = mLayoutInflater.inflate(R.layout.item_v1, container, false);
         return new ViewHolder(view);
     }
 
@@ -40,7 +37,6 @@ public class Item0Component extends LegoComponent<Item0Component.ViewHolder, Ite
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
-
         private TextView title;
 
         public ViewHolder(View itemView) {
@@ -50,30 +46,8 @@ public class Item0Component extends LegoComponent<Item0Component.ViewHolder, Ite
     }
 
     public static class Model implements LegoModel {
-        @LegoField
-        public String title;
 
         @LegoIndex
-        public int content;
-
-        @LegoField
-        public List<String> a;
-
-        @LegoField
-        public int[] b;
-    }
-
-    public static class Model1 implements LegoModel {
-
-        @LegoField
-        public int[] title;
-
-        @LegoField
-        public Model2 model2;
-    }
-
-    public static class Model2 {
-        @LegoField
-        public String a;
+        public String title;
     }
 }
