@@ -73,6 +73,7 @@ public class FileMaker {
                 .addAnnotation(Override.class)
                 .returns(Class.class);
 
+        boolean isCheckStart = false;
         for (Element annotatedElement: roundEnvironment.getElementsAnnotatedWith(Component.class)) {
             if (annotatedElement.getKind() != ElementKind.CLASS) {
                 error(annotatedElement, "Only classes can be annotated with @%s", Component.class.getSimpleName());
@@ -81,10 +82,21 @@ public class FileMaker {
             TypeElement element = (TypeElement) annotatedElement;
             DeclaredType declaredType = (DeclaredType) element.getSuperclass();
             TypeMirror modelTypeMirror = declaredType.getTypeArguments().get(1);
+            if (!isCheckStart) {
+                isCheckStart = true;
+                methodBuilder
+                        .beginControlFlow("if (component.getClass().equals($T.class))", element);
+            } else {
+                methodBuilder
+                        .nextControlFlow("else if (component.getClass().equals($T.class))", element);
+            }
+
+
             methodBuilder
-                    .beginControlFlow("if (component.getClass().equals($T.class))", element)
-                    .addStatement("return $T.class", modelTypeMirror)
-                    .endControlFlow();
+                    .addStatement("return $T.class", modelTypeMirror);
+        }
+        if (isCheckStart) {
+            methodBuilder.endControlFlow();
         }
         methodBuilder
                 .addStatement("return null");
@@ -100,6 +112,7 @@ public class FileMaker {
                 .addAnnotation(Override.class)
                 .returns(Object.class);
 
+        boolean isCheckStart = false;
         for (Element annotatedElement: roundEnvironment.getElementsAnnotatedWith(LegoIndex.class)) {
             if (annotatedElement.getKind() != ElementKind.FIELD) {
                 error(annotatedElement, "Only field can be annotated with @%s", LegoIndex.class.getSimpleName());
@@ -107,9 +120,17 @@ public class FileMaker {
             }
             VariableElement element = (VariableElement) annotatedElement;
             TypeElement parent = (TypeElement) element.getEnclosingElement();
-            builder.beginControlFlow("if ($T.class.equals(model.getClass()))", parent)
-                    .addStatement("return (($T) model).$N", parent, element.getSimpleName())
-                    .endControlFlow();
+            if (!isCheckStart) {
+                isCheckStart = true;
+                builder.beginControlFlow("if ($T.class.equals(model.getClass()))", parent);
+            } else {
+                builder.nextControlFlow("else if ($T.class.equals(model.getClass()))", parent);
+            }
+            builder
+                    .addStatement("return (($T) model).$N", parent, element.getSimpleName());
+        }
+        if (isCheckStart) {
+            builder.endControlFlow();
         }
         builder.addStatement("return null");
         return builder.build();

@@ -75,7 +75,7 @@ public class LegoAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         for (LegoComponent component : mComponents) {
-            if (component.getClass().hashCode() == viewType) {
+            if (component.getViewType() == viewType) {
                 return component.getViewHolder(parent);
             }
         }
@@ -112,7 +112,7 @@ public class LegoAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     public int getItemViewType(int position) {
         LegoModel dataModel = mModels.get(position);
         LegoComponent viewModel = getViewModelByModel(dataModel);
-        return viewModel.getClass().hashCode();
+        return viewModel.getViewType();
     }
 
     @SuppressWarnings("unchecked")
