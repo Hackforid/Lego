@@ -4,12 +4,11 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 
-import com.smilehacker.lego.LegoFactory;
 import com.smilehacker.lego.LegoModel;
+import com.smilehacker.lego.util.StickyHeaderRecyclerViewContainer;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,6 +19,7 @@ public class MainActivity extends AppCompatActivity {
     private RecyclerView mRv;
     private TestAdapter mAdapter;
     private Button mBtn;
+    private StickyHeaderRecyclerViewContainer mContainer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -27,10 +27,16 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         mRv = (RecyclerView) findViewById(R.id.rv);
         mBtn = (Button) findViewById(R.id.btn_refresh);
+        mContainer = (StickyHeaderRecyclerViewContainer) findViewById(R.id.container);
         mAdapter = new TestAdapter(this);
 
         mRv.setAdapter(mAdapter);
         mRv.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
+//        StickyHeaderDecoration decoration = new StickyHeaderDecoration();
+//        decoration.addHeaderViewType(new Item1Component(this).getViewType());
+
+//        mRv.addItemDecoration(decoration);
+        mContainer.addHeaderViewType(new Item1Component(this).getViewType());
 
         loadData();
 
@@ -49,25 +55,18 @@ public class MainActivity extends AppCompatActivity {
             Item0Component.Model model = new Item0Component.Model();
             model.title = String.format("item %d", i);
             model.content = i;
-            model.b = new int[] {1,2};
-            model.a = new ArrayList<>();
-            model.a.add("aa");
-            model.a.add("bb");
             models.add(model);
         }
-        LegoFactory factory = new LegoFactory();
-        factory.isModelEquals(models, mAdapter.getData());
+
+        Item1Component.Model model1 = new Item1Component.Model();
+        model1.title = "a";
+        Item1Component.Model model2 = new Item1Component.Model();
+        model2.title = "b";
+
+        models.add(0, model1);
+        models.add(10, model2);
+
         mAdapter.commitData(models);
-
-        Item0Component.Model1 a = new Item0Component.Model1();
-        a.model2 = new Item0Component.Model2();
-        a.model2.a = "a";
-
-        Item0Component.Model1 b = new Item0Component.Model1();
-        b.model2 = new Item0Component.Model2();
-        b.model2.a = "aa";
-
-        Log.d(TAG, "is equals " + factory.isModelEquals(a, b));
     }
 
 

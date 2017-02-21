@@ -19,8 +19,8 @@ public class LegoAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     private static String TAG = LegoAdapter.class.getSimpleName();
 
-    private List<com.smilehacker.lego.LegoComponent> mComponents = new ArrayList<>();
-    private List<com.smilehacker.lego.LegoModel> mModels = new ArrayList<>();
+    private List<LegoComponent> mComponents = new ArrayList<>();
+    private List<LegoModel> mModels = new ArrayList<>();
 
     public static ILegoFactory legoFactory;
 
