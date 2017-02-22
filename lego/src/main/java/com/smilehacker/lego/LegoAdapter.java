@@ -1,6 +1,7 @@
 package com.smilehacker.lego;
 
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v7.util.DiffUtil;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -90,6 +91,13 @@ public class LegoAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         viewModel.onBindData(holder, model);
     }
 
+    @Override
+    public void onBindViewHolder(RecyclerView.ViewHolder holder, int position, List<Object> payloads) {
+        LegoModel model = mModels.get(position);
+        LegoComponent viewModel = getViewModelByModel(model);
+        //noinspection unchecked
+        viewModel.onBindData(holder, model, payloads);
+    }
 
     @NonNull
     private LegoComponent getViewModelByModel(com.smilehacker.lego.LegoModel dataModel) {
@@ -128,7 +136,7 @@ public class LegoAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         return null;
     }
 
-    private static class DiffCallback extends DiffUtil.Callback {
+    private class DiffCallback extends DiffUtil.Callback {
 
         private List<LegoModel> mOldModels;
         private List<LegoModel> mNewModels;
@@ -169,5 +177,27 @@ public class LegoAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             LegoModel newModel = mNewModels.get(newItemPosition);
             return legoFactory.isModelEquals(oldModel, newModel);
         }
+
+        @Nullable
+        @Override
+        public Object getChangePayload(int oldItemPosition, int newItemPosition) {
+            LegoModel oldModel = mOldModels.get(oldItemPosition);
+            LegoModel newModel = mNewModels.get(newItemPosition);
+            LegoComponent component = getComponentByModel(oldModel);
+            if (component != null) {
+                //noinspection unchecked
+                return component.getChangePayload(oldModel, newModel);
+            }
+            return super.getChangePayload(oldItemPosition, newItemPosition);
+        }
+    }
+
+    public LegoComponent getComponentByModel(LegoModel model) {
+        for (LegoComponent component: mComponents) {
+            if (model.getClass().equals(legoFactory.getModelClass(component))) {
+                return component;
+            }
+        }
+        return null;
     }
 }
