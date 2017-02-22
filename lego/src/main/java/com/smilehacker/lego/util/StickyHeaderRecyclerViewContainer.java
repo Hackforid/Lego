@@ -141,14 +141,13 @@ public class StickyHeaderRecyclerViewContainer extends FrameLayout {
         mCurrentHeaderPos = headerPos;
         int viewType = adapter.getItemViewType(headerPos);
 
-        View itemView = null;
         RecyclerView.ViewHolder viewHolder = mCachedHeaderViewHolders.get(viewType);
         if (viewHolder == null) {
             viewHolder = adapter.createViewHolder(parent, viewType);
         }
         //noinspection unchecked
         adapter.bindViewHolder(viewHolder, headerPos);
-        itemView = viewHolder.itemView;
+        View itemView = viewHolder.itemView;
 
         ViewGroup.LayoutParams lp = itemView.getLayoutParams();
         if (lp == null) {
