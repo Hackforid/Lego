@@ -50,10 +50,10 @@ public class Item0Component extends LegoComponent<Item0Component.ViewHolder, Ite
     }
 
     public static class Model implements LegoModel {
-        @LegoField
+        @LegoIndex
         public String title;
 
-        @LegoIndex
+        @LegoField
         public int content;
 
         @LegoField

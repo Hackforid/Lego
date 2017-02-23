@@ -12,6 +12,7 @@ import com.smilehacker.lego.util.StickyHeaderRecyclerViewContainer;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -54,7 +55,7 @@ public class MainActivity extends AppCompatActivity {
         for (int i = 0; i < 30; i++) {
             Item0Component.Model model = new Item0Component.Model();
             model.title = String.format("item %d", i);
-            model.content = i;
+            model.content = new Random().nextInt();
             models.add(model);
         }
 
