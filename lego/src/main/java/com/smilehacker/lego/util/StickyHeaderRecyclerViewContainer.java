@@ -26,6 +26,39 @@ public class StickyHeaderRecyclerViewContainer extends FrameLayout {
     private int mCurrentHeaderPos = NO_POSITION;
     private View mCurrentHeaderView;
     private SparseArray<RecyclerView.ViewHolder> mCachedHeaderViewHolders = new SparseArray<>();
+    private RecyclerView.Adapter mAdapter;
+
+    private final RecyclerView.AdapterDataObserver mAdapterDataObserver = new RecyclerView.AdapterDataObserver() {
+        @Override
+        public void onItemRangeChanged(int positionStart, int itemCount) {
+            super.onItemRangeChanged(positionStart, itemCount);
+            refresh();
+        }
+
+        @Override
+        public void onItemRangeInserted(int positionStart, int itemCount) {
+            super.onItemRangeInserted(positionStart, itemCount);
+            refresh();
+        }
+
+        @Override
+        public void onItemRangeRemoved(int positionStart, int itemCount) {
+            super.onItemRangeRemoved(positionStart, itemCount);
+            refresh();
+        }
+
+        @Override
+        public void onItemRangeMoved(int fromPosition, int toPosition, int itemCount) {
+            super.onItemRangeMoved(fromPosition, toPosition, itemCount);
+            refresh();
+        }
+
+        @Override
+        public void onChanged() {
+            super.onChanged();
+            refresh();
+        }
+    };
 
     public StickyHeaderRecyclerViewContainer(Context context) {
         super(context);
@@ -60,6 +93,14 @@ public class StickyHeaderRecyclerViewContainer extends FrameLayout {
             @Override
             public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
                 super.onScrollStateChanged(recyclerView, newState);
+                if (mAdapter != mRecyclerView.getAdapter()) {
+                    if (mAdapter != null) {
+                        mAdapter.unregisterAdapterDataObserver(mAdapterDataObserver);
+                    }
+                    mAdapter = mRecyclerView.getAdapter();
+                    mAdapter.registerAdapterDataObserver(mAdapterDataObserver);
+                    refresh();
+                }
             }
 
             @Override
@@ -68,6 +109,7 @@ public class StickyHeaderRecyclerViewContainer extends FrameLayout {
                 refresh();
             }
         });
+
     }
 
     public void refresh() {

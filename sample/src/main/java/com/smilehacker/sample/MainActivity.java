@@ -8,6 +8,7 @@ import android.view.View;
 import android.widget.Button;
 
 import com.smilehacker.lego.LegoModel;
+import com.smilehacker.lego.util.NoAlphaDefaultItemAnimator;
 import com.smilehacker.lego.util.StickyHeaderRecyclerViewContainer;
 
 import java.util.ArrayList;
@@ -33,10 +34,7 @@ public class MainActivity extends AppCompatActivity {
 
         mRv.setAdapter(mAdapter);
         mRv.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
-//        StickyHeaderDecoration decoration = new StickyHeaderDecoration();
-//        decoration.addHeaderViewType(new Item1Component(this).getViewType());
-
-//        mRv.addItemDecoration(decoration);
+        mRv.setItemAnimator(new NoAlphaDefaultItemAnimator());
         mContainer.addHeaderViewType(new Item1Component(this).getViewType());
 
         loadData();
