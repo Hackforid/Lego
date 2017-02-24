@@ -118,6 +118,7 @@ public class StickyHeaderRecyclerViewContainer extends FrameLayout {
             mCurrentHeaderPos = NO_POSITION;
             if (mCurrentHeaderView != null) {
                 removeView(mCurrentHeaderView);
+                mCurrentHeaderView = null;
             }
             return;
         } else {

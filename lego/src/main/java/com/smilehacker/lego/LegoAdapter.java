@@ -30,6 +30,7 @@ public class LegoAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     private DiffCallback mDiffCallback = new DiffCallback();
 
+
     {
         init();
     }
