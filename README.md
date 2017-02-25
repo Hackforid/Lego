@@ -2,6 +2,8 @@
 
 Lego是一个让你以更优雅的方式来开发RecylerView的Helper。通过他，你能以类似React.js里更组件化更清晰更工程的方式去配置Adpater，同时依靠apt来直接生成高效的diff代码。
 
+在[蛋卷基金](https://danjuanapp.com/)的APP里，我们使用它精简了大量的代码，通过它实现APP的组件化更方便，和Airbnb的epoxy相比，侵入性更小，非常容易迁移，也更容易集成其他工具。
+
 
 
 ## Example
