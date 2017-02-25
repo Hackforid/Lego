@@ -1,12 +1,12 @@
 #Lego
 
-Lego是一个让你以更优雅的方式开发RecylerView的Helper，通过他，你能以更组件化更清晰更工程化的配置Adpater，同时依靠apt来直接生成高效的diff代码。
+Lego是一个让你以更优雅的方式来开发RecylerView的Helper。通过他，你能以类似React.js里更组件化更清晰更工程的方式去配置Adpater，同时依靠apt来直接生成高效的diff代码。
 
 
 
 ## Example
 
-之前你实现一个多ViewType的RecyclerView Adapter需要做很多冗余的事。
+之前实现一个多ViewType的RecyclerView Adapter需要做很多冗余的事。
 
 ```java
 public class OldAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
@@ -97,11 +97,11 @@ allprojects {
 
 ## Usage
 
-Lego是从React.js和Vue.js里渲染item的方式里得到灵感创造出来的，通过向Adapter提供Model来直接渲染出列表，开发者只需要提供Model对应的View，而不用去关系其规则细节，从而摆脱对`ViewType`这一概念的冗余实现。
+Lego从React.js和Vue.js里渲染item的方式里得到灵感，通过向Adapter提供Model来直接渲染出列表，开发者只需要提供Model对应的View，而不用去关心其规则细节，从而摆脱对`ViewType`这一概念的冗余实现。
 
 ### 1. LegoAdapter
 
-RecyclerView的Adapter需要继承自``LegoAdapter``，并在里面注册```Component```。
+RecyclerView的Adapter需要继承自``LegoAdapter``，并注册```Component```。
 
 ```java
 public class SampleAdapter extends LegoAdapter {
@@ -163,11 +163,11 @@ RecyclerView可以使用notifyItemChanged、notifyItemInserted、notifyItemRange
 
 首先我们需要在调用adapter的``setDiffUtilEnabled``的方法来启动DiffUtil功能，``setDiffUtilDetectMoves``来设置是否使用DiffUtil的detect moves功能。
 
-DiffUtil需要实现两个个方法：
+DiffUtil需要实现两个方法：
 
-1. `` boolean areItemsTheSame(int oldItemPosition, int newItemPosition)``：告述DiffUtil，两个item是否是同一个Item。
+1. `` boolean areItemsTheSame(int oldItemPosition, int newItemPosition)``：告诉DiffUtil，两个position是否是同一个Item。
 
-   在LegoModel中使用``@LegoIndex``来标注index，相同的Item则应该有相同的Index
+   在LegoModel中使用``@LegoIndex``来标注index，相同的Item应该有相同的Index
 
    ```java
    @LegoIndex
@@ -205,19 +205,21 @@ DiffUtil需要实现两个个方法：
 
 ### DiffUtil QA
 
-1. 启用DiffUtil后，当item数据变化，更新UI时数据不同的item会闪一下
+1. 启用DiffUtil后，当数据变化，数据不同的item会闪一下
 
    这是因为RecyclerView item更新的默认动画有alpha变化的效果，Lego提供一个``NoAlphaDefaultItemAnimator``来方便开发者直接去掉这个alpha动画，就没“白光一闪”的问题了。
 
    ``recyclerView.setItemAnimator(new NoAlphaDefaultItemAnimator());``
 
+
+
 ## Other Util
 
-Lego还提供RecyclerView经常会用到的遍历工具
+Lego还提供RecyclerView经常会用到的一些工具。
 
 ### StickyHeaderRecyclerViewContainer
 
-一个用来实现StickyHeader交互的Layout
+一个用来实现StickyHeader效果的Layout
 
 ```xm
     <com.smilehacker.lego.util.StickyHeaderRecyclerViewContainer
