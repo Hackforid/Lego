@@ -201,10 +201,49 @@ DiffUtil需要实现两个个方法：
 
 3. `` Object getChangePayload(int oldItemPosition, int newItemPosition) ``: （可选）如果数据不同，返回不同的部分，可以用一个bundle来封装。
 
+   此处涉及ItemView的部分更新，因此需要开发者根据自己的业务自行实现，需要重载Component的``Object getChangePayload(M oldModel, M newModel)``方法，当返回不为null时，载入数据时会先回调Component的``void onBindData(V viewHolder, M model, List<Object> payloads)``方法，用法和DiffUtil及RecyclerView的实现一样，请直接查看相关文档。
+
+### DiffUtil QA
+
+1. 启用DiffUtil后，当item数据变化，更新UI时数据不同的item会闪一下
+
+   这是因为RecyclerView item更新的默认动画有alpha变化的效果，Lego提供一个``NoAlphaDefaultItemAnimator``来方便开发者直接去掉这个alpha动画，就没“白光一闪”的问题了。
+
+   ``recyclerView.setItemAnimator(new NoAlphaDefaultItemAnimator());``
+
+## Other Util
+
+Lego还提供RecyclerView经常会用到的遍历工具
+
+### StickyHeaderRecyclerViewContainer
+
+一个用来实现StickyHeader交互的Layout
+
+```xm
+    <com.smilehacker.lego.util.StickyHeaderRecyclerViewContainer
+        android:id="@+id/container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        >
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/rv"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            >
+        </android.support.v7.widget.RecyclerView>
+
+    </com.smilehacker.lego.util.StickyHeaderRecyclerViewContainer>
+```
+
+```java
+ mContainer.addHeaderViewType(new HeaderComponent(this).getViewType());
+```
+
+
+
 License
 --------
 
-    Copyright 2017 Smilehacker, Inc.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
