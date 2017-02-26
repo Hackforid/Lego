@@ -218,9 +218,7 @@ public class FileMaker {
         builder.addStatement("return true");
         builder.endControlFlow();
 
-        builder.beginControlFlow("if (model0 == null && model1 == null)");
-        builder.addStatement("return true");
-        builder.nextControlFlow("else if (model0 == null || model1 == null)");
+        builder.beginControlFlow("if (model0 == null || model1 == null)");
         builder.addStatement("return false");
         builder.endControlFlow();
 
