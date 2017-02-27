@@ -21,7 +21,7 @@ public class LegoAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private static String TAG = LegoAdapter.class.getSimpleName();
 
     private List<LegoComponent> mComponents = new ArrayList<>();
-    private List<LegoModel> mModels = new ArrayList<>();
+    private List<Object> mModels = new ArrayList<>();
 
     public static ILegoFactory legoFactory;
 
@@ -40,16 +40,16 @@ public class LegoAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         mComponents.add(component);
     }
 
-    public void setData(List<LegoModel> models) {
+    public void setData(List<Object> models) {
         mModels.clear();
         mModels.addAll(models);
     }
 
-    public List<LegoModel> getData() {
+    public List<Object> getData() {
         return mModels;
     }
 
-    public void commitData(List<LegoModel> models) {
+    public void commitData(List<Object> models) {
         if (mDiffUtilEnabled) {
             diffNotifyDataSetChanged(models);
             setData(models);
@@ -67,7 +67,7 @@ public class LegoAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         mDiffUtilDetectMoves = detectMoves;
     }
 
-    private void diffNotifyDataSetChanged(List<LegoModel> newList) {
+    private void diffNotifyDataSetChanged(List<Object> newList) {
         mDiffCallback.setOldModels(mModels);
         mDiffCallback.setNewModels(newList);
         DiffUtil.DiffResult result = DiffUtil.calculateDiff(mDiffCallback, mDiffUtilDetectMoves);
@@ -86,7 +86,7 @@ public class LegoAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
-        LegoModel model = mModels.get(position);
+        Object model = mModels.get(position);
         LegoComponent viewModel = getViewModelByModel(model);
         //noinspection unchecked
         viewModel.onBindData(holder, model);
@@ -94,14 +94,14 @@ public class LegoAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position, List<Object> payloads) {
-        LegoModel model = mModels.get(position);
+        Object model = mModels.get(position);
         LegoComponent viewModel = getViewModelByModel(model);
         //noinspection unchecked
         viewModel.onBindData(holder, model, payloads);
     }
 
     @NonNull
-    private LegoComponent getViewModelByModel(com.smilehacker.lego.LegoModel dataModel) {
+    private LegoComponent getViewModelByModel(Object dataModel) {
         for (LegoComponent component : mComponents) {
             Class modelClass = legoFactory.getModelClass(component);
             if (dataModel.getClass().equals(modelClass)) {
@@ -119,7 +119,7 @@ public class LegoAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     @Override
     public int getItemViewType(int position) {
-        LegoModel dataModel = mModels.get(position);
+        Object dataModel = mModels.get(position);
         LegoComponent viewModel = getViewModelByModel(dataModel);
         return viewModel.getViewType();
     }
@@ -139,14 +139,14 @@ public class LegoAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     private class DiffCallback extends DiffUtil.Callback {
 
-        private List<LegoModel> mOldModels;
-        private List<LegoModel> mNewModels;
+        private List<Object> mOldModels;
+        private List<Object> mNewModels;
 
-        public void setOldModels(List<LegoModel> models) {
+        public void setOldModels(List<Object> models) {
             mOldModels = models;
         }
 
-        public void setNewModels(List<LegoModel> models) {
+        public void setNewModels(List<Object> models) {
             mNewModels = models;
         }
 
@@ -162,8 +162,8 @@ public class LegoAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
         @Override
         public boolean areItemsTheSame(int oldItemPosition, int newItemPosition) {
-            LegoModel oldModel = mOldModels.get(oldItemPosition);
-            LegoModel newModel = mNewModels.get(newItemPosition);
+            Object oldModel = mOldModels.get(oldItemPosition);
+            Object newModel = mNewModels.get(newItemPosition);
             Object oldIndex = legoFactory.getModelIndex(oldModel);
             Object newIndex = legoFactory.getModelIndex(newModel);
             if (oldIndex != null && newIndex != null && oldIndex.equals(newIndex)) {
@@ -174,16 +174,16 @@ public class LegoAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
         @Override
         public boolean areContentsTheSame(int oldItemPosition, int newItemPosition) {
-            LegoModel oldModel = mOldModels.get(oldItemPosition);
-            LegoModel newModel = mNewModels.get(newItemPosition);
+            Object oldModel = mOldModels.get(oldItemPosition);
+            Object newModel = mNewModels.get(newItemPosition);
             return legoFactory.isModelEquals(oldModel, newModel);
         }
 
         @Nullable
         @Override
         public Object getChangePayload(int oldItemPosition, int newItemPosition) {
-            LegoModel oldModel = mOldModels.get(oldItemPosition);
-            LegoModel newModel = mNewModels.get(newItemPosition);
+            Object oldModel = mOldModels.get(oldItemPosition);
+            Object newModel = mNewModels.get(newItemPosition);
             LegoComponent component = getComponentByModel(oldModel);
             if (component != null) {
                 //noinspection unchecked
@@ -193,7 +193,7 @@ public class LegoAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         }
     }
 
-    public LegoComponent getComponentByModel(LegoModel model) {
+    public LegoComponent getComponentByModel(Object model) {
         for (LegoComponent component: mComponents) {
             if (model.getClass().equals(legoFactory.getModelClass(component))) {
                 return component;

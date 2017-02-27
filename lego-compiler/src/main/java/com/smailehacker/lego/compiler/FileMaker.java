@@ -104,10 +104,9 @@ public class FileMaker {
     }
 
     private MethodSpec getModelIndexMethod(RoundEnvironment roundEnvironment) {
-        TypeName legoModelClassName = ClassName.get("com.smilehacker.lego", "LegoModel");
 
         MethodSpec.Builder builder = MethodSpec.methodBuilder("getModelIndex")
-                .addParameter(legoModelClassName, "model")
+                .addParameter(Object.class, "model")
                 .addModifiers(Modifier.PUBLIC)
                 .addAnnotation(Override.class)
                 .returns(Object.class);
@@ -138,11 +137,9 @@ public class FileMaker {
 
 
     private MethodSpec getaMethodModelEquals(RoundEnvironment roundEnvironment) {
-        TypeName legoModelClassName = ClassName.get("com.smilehacker.lego", "LegoModel");
-
         MethodSpec.Builder builder = MethodSpec.methodBuilder("isModelEquals")
-                .addParameter(legoModelClassName, "model0")
-                .addParameter(legoModelClassName, "model1")
+                .addParameter(Object.class, "model0")
+                .addParameter(Object.class, "model1")
                 .addModifiers(Modifier.PUBLIC)
                 .addAnnotation(Override.class)
                 .returns(int.class);

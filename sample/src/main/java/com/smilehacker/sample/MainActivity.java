@@ -7,7 +7,6 @@ import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.Button;
 
-import com.smilehacker.lego.LegoModel;
 import com.smilehacker.lego.util.NoAlphaDefaultItemAnimator;
 import com.smilehacker.lego.util.StickyHeaderRecyclerViewContainer;
 
@@ -49,7 +48,7 @@ public class MainActivity extends AppCompatActivity {
 
 
     private void loadData() {
-        List<LegoModel> models = new ArrayList<>();
+        List<Object> models = new ArrayList<>();
         for (int i = 0; i < 30; i++) {
             Item0Component.Model model = new Item0Component.Model();
             model.title = String.format("item %d", i);

@@ -8,7 +8,6 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.smilehacker.lego.LegoComponent;
-import com.smilehacker.lego.LegoModel;
 import com.smilehacker.lego.annotation.Component;
 import com.smilehacker.lego.annotation.LegoIndex;
 
@@ -45,7 +44,7 @@ public class Item1Component extends LegoComponent<Item1Component.ViewHolder, Ite
         }
     }
 
-    public static class Model implements LegoModel {
+    public static class Model {
 
         @LegoIndex
         public String title;

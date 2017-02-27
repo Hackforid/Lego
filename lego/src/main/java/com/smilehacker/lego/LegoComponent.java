@@ -9,7 +9,7 @@ import java.util.List;
  * Created by zhouquan on 17/2/18.
  */
 
-public abstract class LegoComponent<V extends RecyclerView.ViewHolder, M extends LegoModel> {
+public abstract class LegoComponent<V extends RecyclerView.ViewHolder, M> {
 
     protected abstract V getViewHolder(ViewGroup container);
 

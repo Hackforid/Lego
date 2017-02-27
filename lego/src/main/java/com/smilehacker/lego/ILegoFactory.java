@@ -8,7 +8,7 @@ public interface ILegoFactory {
 
     Class getModelClass(LegoComponent component);
 
-    Object getModelIndex(LegoModel model);
+    Object getModelIndex(Object model);
 
     boolean isModelEquals(Object model0, Object model1);
 }
