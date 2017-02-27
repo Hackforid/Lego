@@ -60,7 +60,7 @@ public class SampleComponent extends LegoComponent<ViewHolder, Model> {
 public class ViewHolder extends RecyclerView.ViewHolder {
 }
 
-public class Model implements LegoModel {
+public class Model {
 }
 ```
 
@@ -84,7 +84,7 @@ public class NewAdapter extends LegoAdapter {
 
 ```groovy
 dependencies {
-    compile 'com.github.Hackforid.Lego:annotation:0.1.9'
+    compile 'com.github.Hackforid.Lego:annotation:0.2.0'
 }
 
 allprojects {
@@ -141,12 +141,12 @@ public class SampleComponent extends LegoComponent<ViewHolder, Model> {
 
 还有一个``onBindData(V viewHolder, M model, List<Object> payloads)``方法，这个在使用DiffUtil时使用，你可以在后面的高级用法里查询。
 
-### 3. LegoModel
+### 3. Model
 
-所有提供给Adapter的数据都需要继承自``LegoAdapter``
+ 开发者需要向Adapter提供数据来渲染component，Model可以是任何数据类型
 
 ```java
-public static class Model implements LegoModel {
+public class Model {
     @LegoIndex
     public String title;
 
@@ -155,7 +155,7 @@ public static class Model implements LegoModel {
 }
 ```
 
-然后使用LegoAdapter的``commitData(List<LegoModel> models)``来提交数据。
+使用LegoAdapter的``commitData(List<Object> models)``来提交数据。
 
 
 
@@ -183,7 +183,7 @@ DiffUtil需要实现两个方法：
    Lego默认调用mode的``equals``方法来判断Item的数据是否相同，当然如果每一个model都去重载``equals``方法更累，所以Lego提供``@LegoField``注解来方便用户标识需要用来判断的field。
 
    ```java
-   public static class Model implements LegoModel {
+   public static class Model {
        @LegoField public String title;
        @LegoField public int content;
    }
@@ -242,6 +242,7 @@ Lego还提供RecyclerView经常会用到的一些工具。
 ```java
  mContainer.addHeaderViewType(new HeaderComponent(this).getViewType());
 ```
+
 
 
 
