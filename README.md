@@ -43,7 +43,6 @@ public class OldAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 我们把每种viewType对应的item封装为一个`component`
 
 ```java
-@Component
 public class SampleComponent extends LegoComponent<ViewHolder, Model> {
 
     @Override
@@ -120,7 +119,6 @@ public class SampleAdapter extends LegoAdapter {
 ``Component``是一个对``ViewHolder``和``Model``的连接，它类似MVP里的presenter，而``ViewHolder``则是View，``Model``便是Model。
 
 ```java
-@Component
 public class SampleComponent extends LegoComponent<ViewHolder, Model> {
 
     @Override
@@ -135,7 +133,7 @@ public class SampleComponent extends LegoComponent<ViewHolder, Model> {
 }
 ```
 
-``Component``需要继承自LegoComponent,并且一定要用Component注解。
+``Component``需要继承自LegoComponent。
 
 你需要实现两个方法：``getViewHolder``和``onBindData``，前者你需要返回这个Component对应的ViewHolder，后者就是普通Adapter里的``onBindViewHolder``，在这里把Model里的数据添加到ViewHolder上。
 
