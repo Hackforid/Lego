@@ -83,7 +83,7 @@ public class NewAdapter extends LegoAdapter {
 
 ```groovy
 dependencies {
-    compile 'com.github.Hackforid.Lego:annotation:0.2.0'
+    compile 'com.github.Hackforid.Lego:annotation:0.2.1'
 }
 
 allprojects {
