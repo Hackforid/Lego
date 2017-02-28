@@ -21,6 +21,7 @@ import com.smilehacker.lego.annotation.LegoIndex;
 public class Item0Component extends LegoComponent<Item0Component.ViewHolder, Item0Component.Model> {
 
     private LayoutInflater mLayoutInflater;
+    private final static String TAG = Item0Component.class.getSimpleName();
 
     public Item0Component(Context context) {
         mLayoutInflater = LayoutInflater.from(context);

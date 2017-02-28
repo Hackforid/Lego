@@ -4,13 +4,16 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 
 import com.smilehacker.lego.LegoModel;
 import com.smilehacker.lego.util.NoAlphaDefaultItemAnimator;
+import com.smilehacker.lego.util.ReflectionUtil;
 import com.smilehacker.lego.util.StickyHeaderRecyclerViewContainer;
 
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -45,6 +48,8 @@ public class MainActivity extends AppCompatActivity {
                 loadData();
             }
         });
+
+        test();
     }
 
 
@@ -68,5 +73,24 @@ public class MainActivity extends AppCompatActivity {
         mAdapter.commitData(models);
     }
 
+    private void test() {
+        Item0Component component = new Item0Component(this);
+        long time = System.currentTimeMillis();
+        for (int i = 0; i < 10000; i++) {
+            mAdapter.legoFactory.getModelClass(component);
+        }
+        Log.i(TAG, "first cost " + (System.currentTimeMillis() - time));
+
+        time = System.currentTimeMillis();
+        for (int i = 0; i < 10000; i++) {
+            Type[] types = ReflectionUtil.getParameterizedTypes(component);
+            try {
+                Class clazz = ReflectionUtil.getClass(types[1]);
+            } catch (ClassNotFoundException e) {
+                e.printStackTrace();
+            }
+        }
+        Log.i(TAG, "second cost " + (System.currentTimeMillis() - time));
+    }
 
 }
