@@ -9,7 +9,6 @@ import android.widget.TextView;
 
 import com.smilehacker.lego.LegoComponent;
 import com.smilehacker.lego.LegoModel;
-import com.smilehacker.lego.annotation.Component;
 import com.smilehacker.lego.annotation.LegoField;
 import com.smilehacker.lego.annotation.LegoIndex;
 
@@ -17,7 +16,6 @@ import com.smilehacker.lego.annotation.LegoIndex;
  * Created by zhouquan on 17/2/18.
  */
 
-@Component
 public class Item0Component extends LegoComponent<Item0Component.ViewHolder, Item0Component.Model> {
 
     private LayoutInflater mLayoutInflater;

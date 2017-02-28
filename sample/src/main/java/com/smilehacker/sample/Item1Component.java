@@ -9,14 +9,12 @@ import android.widget.TextView;
 
 import com.smilehacker.lego.LegoComponent;
 import com.smilehacker.lego.LegoModel;
-import com.smilehacker.lego.annotation.Component;
 import com.smilehacker.lego.annotation.LegoIndex;
 
 /**
  * Created by kleist on 2017/2/21.
  */
 
-@Component
 public class Item1Component extends LegoComponent<Item1Component.ViewHolder, Item1Component.Model> {
 
 
