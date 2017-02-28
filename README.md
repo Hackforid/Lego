@@ -85,7 +85,7 @@ public class NewAdapter extends LegoAdapter {
 
 ```groovy
 dependencies {
-    compile 'com.github.Hackforid.Lego:annotation:0.2.1'
+    compile 'com.github.Hackforid.Lego:annotation:0.2.2'
 }
 
 allprojects {
@@ -140,6 +140,8 @@ public class SampleComponent extends LegoComponent<ViewHolder, Model> {
 你需要实现两个方法：``getViewHolder``和``onBindData``，前者你需要返回这个Component对应的ViewHolder，后者就是普通Adapter里的``onBindViewHolder``，在这里把Model里的数据添加到ViewHolder上。
 
 还有一个``onBindData(V viewHolder, M model, List<Object> payloads)``方法，这个在使用DiffUtil时使用，你可以在后面的高级用法里查询。
+
+【注意】LegoComponent通过`getModelClass`方法使用反射获取Model的class，如果开发者因为使用复杂的继承关系导致该方法获取失败，请手动重载之返回真正的Model class。
 
 ### 3. Model
 
