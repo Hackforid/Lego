@@ -7,7 +7,6 @@ import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.ViewGroup;
 
-import com.smilehacker.lego.util.LegoComponentManager;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
@@ -31,8 +30,6 @@ public class LegoAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private boolean mDiffUtilDetectMoves = true;
 
     private DiffCallback mDiffCallback = new DiffCallback();
-
-    private LegoComponentManager mLegoComponentManager = LegoComponentManager.getInstance();
 
     {
         init();
@@ -106,7 +103,7 @@ public class LegoAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     @NonNull
     private LegoComponent getViewModelByModel(com.smilehacker.lego.LegoModel dataModel) {
         for (LegoComponent component : mComponents) {
-            Class modelClass = mLegoComponentManager.getModel(component);
+            Class modelClass = component.getModelClass();
             if (dataModel.getClass().equals(modelClass)) {
                 return component;
             }
@@ -198,7 +195,7 @@ public class LegoAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     public LegoComponent getComponentByModel(LegoModel model) {
         for (LegoComponent component: mComponents) {
-            if (model.getClass().equals(mLegoComponentManager.getModel(component))) {
+            if (model.getClass().equals(component.getClass())) {
                 return component;
             }
         }
