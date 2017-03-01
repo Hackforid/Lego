@@ -1,5 +1,7 @@
 #Lego
 
+[![](https://jitpack.io/v/Hackforid/Lego.svg)](https://jitpack.io/#Hackforid/Lego)
+
 Lego是一个让你以更优雅的方式来开发RecylerView的Helper。通过他，你能以类似React.js里更组件化更清晰更工程的方式去配置Adpater，同时依靠apt来直接生成高效的diff代码。
 
 在[蛋卷基金](https://danjuanapp.com/)的APP里，我们使用它精简了大量的代码，通过它实现APP的组件化更方便，和Airbnb的epoxy相比，侵入性更小，非常容易迁移，也更容易集成其他工具。
@@ -43,7 +45,6 @@ public class OldAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 我们把每种viewType对应的item封装为一个`component`
 
 ```java
-@Component
 public class SampleComponent extends LegoComponent<ViewHolder, Model> {
 
     @Override
@@ -60,7 +61,7 @@ public class SampleComponent extends LegoComponent<ViewHolder, Model> {
 public class ViewHolder extends RecyclerView.ViewHolder {
 }
 
-public class Model implements LegoModel {
+public class Model {
 }
 ```
 
@@ -84,7 +85,7 @@ public class NewAdapter extends LegoAdapter {
 
 ```groovy
 dependencies {
-    compile 'com.github.Hackforid.Lego:annotation:0.1.9'
+    compile 'com.github.Hackforid.Lego:annotation:0.2.2'
 }
 
 allprojects {
@@ -120,7 +121,6 @@ public class SampleAdapter extends LegoAdapter {
 ``Component``是一个对``ViewHolder``和``Model``的连接，它类似MVP里的presenter，而``ViewHolder``则是View，``Model``便是Model。
 
 ```java
-@Component
 public class SampleComponent extends LegoComponent<ViewHolder, Model> {
 
     @Override
@@ -135,18 +135,20 @@ public class SampleComponent extends LegoComponent<ViewHolder, Model> {
 }
 ```
 
-``Component``需要继承自LegoComponent,并且一定要用Component注解。
+``Component``需要继承自LegoComponent。
 
 你需要实现两个方法：``getViewHolder``和``onBindData``，前者你需要返回这个Component对应的ViewHolder，后者就是普通Adapter里的``onBindViewHolder``，在这里把Model里的数据添加到ViewHolder上。
 
 还有一个``onBindData(V viewHolder, M model, List<Object> payloads)``方法，这个在使用DiffUtil时使用，你可以在后面的高级用法里查询。
 
-### 3. LegoModel
+【注意】LegoComponent通过`getModelClass`方法使用反射获取Model的class，如果开发者因为使用复杂的继承关系导致该方法获取失败，请手动重载之返回真正的Model class。
 
-所有提供给Adapter的数据都需要继承自``LegoAdapter``
+### 3. Model
+
+ 开发者需要向Adapter提供数据来渲染component，Model可以是任何数据类型
 
 ```java
-public static class Model implements LegoModel {
+public class Model {
     @LegoIndex
     public String title;
 
@@ -155,7 +157,7 @@ public static class Model implements LegoModel {
 }
 ```
 
-然后使用LegoAdapter的``commitData(List<LegoModel> models)``来提交数据。
+使用LegoAdapter的``commitData(List<Object> models)``来提交数据。
 
 
 
@@ -183,7 +185,7 @@ DiffUtil需要实现两个方法：
    Lego默认调用mode的``equals``方法来判断Item的数据是否相同，当然如果每一个model都去重载``equals``方法更累，所以Lego提供``@LegoField``注解来方便用户标识需要用来判断的field。
 
    ```java
-   public static class Model implements LegoModel {
+   public static class Model {
        @LegoField public String title;
        @LegoField public int content;
    }
@@ -242,6 +244,7 @@ Lego还提供RecyclerView经常会用到的一些工具。
 ```java
  mContainer.addHeaderViewType(new HeaderComponent(this).getViewType());
 ```
+
 
 
 

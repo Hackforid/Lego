@@ -3,6 +3,8 @@ package com.smilehacker.lego;
 import android.support.v7.widget.RecyclerView;
 import android.view.ViewGroup;
 
+import com.smilehacker.lego.util.LegoComponentManager;
+
 import java.util.List;
 
 /**
@@ -14,6 +16,8 @@ public abstract class LegoComponent<V extends RecyclerView.ViewHolder, M> {
     protected abstract V getViewHolder(ViewGroup container);
 
     public abstract void onBindData(V viewHolder, M model);
+
+    private Class mModelClass;
 
     public void onBindData(V viewHolder, M model, List<Object> payloads) {
         onBindData(viewHolder, model);
@@ -27,4 +31,10 @@ public abstract class LegoComponent<V extends RecyclerView.ViewHolder, M> {
         return null;
     }
 
+    public Class getModelClass() {
+        if (mModelClass == null) {
+            mModelClass = LegoComponentManager.getInstance().getModel(this);
+        }
+        return mModelClass;
+    }
 }
