@@ -83,9 +83,25 @@ public class NewAdapter extends LegoAdapter {
 
 ## Installation
 
+add apt to you root build.gradle file
+
 ```groovy
+buildscript {
+    dependencies {
+        ...
+        classpath 'com.neenbedankt.gradle.plugins:android-apt:1.8'
+    }
+}
+```
+
+then
+
+```groovy
+apply plugin: 'android-apt'
+
 dependencies {
-    compile 'com.github.Hackforid.Lego:annotation:0.2.3'
+    compile ('com.github.Hackforid.Lego:lego:0.2.3')
+    apt ('com.github.Hackforid.Lego:lego-compiler:0.2.3')
 }
 
 allprojects {
