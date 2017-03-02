@@ -53,17 +53,4 @@ public class Item0Component extends LegoComponent<Item0Component.ViewHolder, Ite
         public int content;
     }
 
-    public static class Model1 {
-
-        @LegoField
-        public int[] title;
-
-        @LegoField
-        public Model2 model2;
-    }
-
-    public static class Model2 {
-        @LegoField
-        public String a;
-    }
 }
