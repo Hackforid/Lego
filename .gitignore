@@ -16,3 +16,4 @@ build/
 *.apk
 *.hprof
 infer-out/
+!gradle-wrapper.properties
