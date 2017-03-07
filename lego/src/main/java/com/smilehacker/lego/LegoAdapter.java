@@ -125,16 +125,17 @@ public class LegoAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     }
 
     @SuppressWarnings("unchecked")
-    private static Method init() {
-        Class factoryClass;
-        try {
-            factoryClass = Class.forName("com.smilehacker.lego.LegoFactory");
-            Constructor<?> constructor = factoryClass.getDeclaredConstructor();
-            legoFactory = (ILegoFactory) constructor.newInstance();
-        } catch (Exception e) {
-            Log.e(TAG, "method error", e);
+    private static void init() {
+        if (legoFactory == null) {
+            Class factoryClass;
+            try {
+                factoryClass = Class.forName("com.smilehacker.lego.LegoFactory");
+                Constructor<?> constructor = factoryClass.getDeclaredConstructor();
+                legoFactory = (ILegoFactory) constructor.newInstance();
+            } catch (Exception e) {
+                Log.e(TAG, "method error", e);
+            }
         }
-        return null;
     }
 
     private class DiffCallback extends DiffUtil.Callback {

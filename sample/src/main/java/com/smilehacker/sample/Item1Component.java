@@ -23,7 +23,7 @@ public class Item1Component extends LegoComponent<Item1Component.ViewHolder, Ite
         mLayoutInflater = LayoutInflater.from(context);
     }
     @Override
-    protected ViewHolder getViewHolder(ViewGroup container) {
+    public ViewHolder getViewHolder(ViewGroup container) {
         View view = mLayoutInflater.inflate(R.layout.item_v1, container, false);
         return new ViewHolder(view);
     }
