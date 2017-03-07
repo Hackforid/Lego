@@ -13,7 +13,7 @@ import java.util.List;
 
 public abstract class LegoComponent<V extends RecyclerView.ViewHolder, M> {
 
-    protected abstract V getViewHolder(ViewGroup container);
+    public abstract V getViewHolder(ViewGroup container);
 
     public abstract void onBindData(V viewHolder, M model);
 
