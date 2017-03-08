@@ -7,9 +7,7 @@ import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.ViewGroup;
 
-
 import java.lang.reflect.Constructor;
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -56,6 +54,13 @@ public class LegoAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         } else {
             setData(models);
             notifyDataSetChanged();
+        }
+    }
+
+    public void notifyModelChange(Object model) {
+        int pos = mModels.indexOf(model);
+        if (pos > 0) {
+            notifyItemChanged(pos);
         }
     }
 
