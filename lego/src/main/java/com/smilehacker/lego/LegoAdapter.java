@@ -57,7 +57,7 @@ public class LegoAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         }
     }
 
-    public void notifyModelChange(Object model) {
+    public void notifyModelChanged(Object model) {
         int pos = mModels.indexOf(model);
         if (pos > 0) {
             notifyItemChanged(pos);
