@@ -211,6 +211,10 @@ public class FileMaker {
                 .addAnnotation(Override.class)
                 .returns(boolean.class);
 
+        builder.beginControlFlow("if (model0 == model1)");
+        builder.addStatement("return true");
+        builder.endControlFlow();
+
         builder.beginControlFlow("if (model0 == null || model1 == null)");
         builder.addStatement("return false");
         builder.endControlFlow();

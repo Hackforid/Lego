@@ -100,8 +100,8 @@ then
 apply plugin: 'android-apt'
 
 dependencies {
-    compile ('com.github.Hackforid.Lego:lego:0.2.5.5')
-    apt ('com.github.Hackforid.Lego:lego-compiler:0.2.5.5')
+    compile ('com.github.Hackforid.Lego:lego:0.2.6')
+    apt ('com.github.Hackforid.Lego:lego-compiler:0.2.6')
 }
 
 allprojects {
@@ -110,6 +110,12 @@ allprojects {
 		maven { url 'https://jitpack.io' }
 	}
 }
+```
+
+Proguard
+
+```
+-keepnames class com.smilehacker.lego.LegoFactory
 ```
 
 
