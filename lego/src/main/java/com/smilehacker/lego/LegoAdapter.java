@@ -143,6 +143,20 @@ public class LegoAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         }
     }
 
+    public static void removeDuplication(List list) {
+        for (int i = 0; i < list.size() - 1; i++) {
+            for (int j = list.size() - 1; j > i; j--) {
+                if (list.get(j).equals(list.get(i))) {
+                    list.remove(j);
+                }
+                if (legoFactory.getModelIndex(list.get(i))
+                        .equals(legoFactory.getModelIndex(list.get(j)))) {
+                    list.remove(j);
+                }
+            }
+        }
+    }
+
     private class DiffCallback extends DiffUtil.Callback {
 
         private List<Object> mOldModels;
