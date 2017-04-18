@@ -1,7 +1,4 @@
-#Lego  
-
-[![Release](https://jitpack.io/v/Hackforid/Lego.svg)]
-(https://jitpack.io/#Hackforid/Lego)
+# Lego [![Release](https://jitpack.io/v/Hackforid/Lego.svg)](https://jitpack.io/#Hackforid/Lego)
 
 Lego是一个让你以更优雅的方式来开发RecylerView的Helper。通过他，你能以类似React.js里更组件化更清晰更工程的方式去配置Adpater，同时依靠apt来直接生成高效的diff代码。
 
