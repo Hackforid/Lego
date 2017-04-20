@@ -61,6 +61,7 @@ public class LegoAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         for (int i = 0, len = mModels.size(); i < len; i++) {
             Object obj = mModels.get(i);
             if (legoFactory.getModelIndex(obj).equals(legoFactory.getModelIndex(model))) {
+                mModels.set(i, model);
                 notifyItemChanged(i);
                 break;
             }
