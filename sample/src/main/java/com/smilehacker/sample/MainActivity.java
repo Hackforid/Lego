@@ -26,6 +26,9 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        //Lego.addFactory(LegoFactory_sample.class);
+
         mRv = (RecyclerView) findViewById(R.id.rv);
         mBtn = (Button) findViewById(R.id.btn_refresh);
         mContainer = (StickyHeaderRecyclerViewContainer) findViewById(R.id.container);

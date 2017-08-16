@@ -28,6 +28,7 @@ public class LegoProcessor extends AbstractProcessor {
     private Elements elementUtils;
     private Filer filer;
     private Messager messager;
+    private String moduleName;
 
     @Override
     public synchronized void init(ProcessingEnvironment processingEnvironment) {
@@ -36,12 +37,14 @@ public class LegoProcessor extends AbstractProcessor {
         elementUtils = processingEnv.getElementUtils();
         filer = processingEnv.getFiler();
         messager = processingEnv.getMessager();
+
+        moduleName = processingEnvironment.getOptions().get("moduleName");
     }
 
     @Override
     public boolean process(Set<? extends TypeElement> set, RoundEnvironment roundEnvironment) {
 
-        new FileMaker(typeUtils, elementUtils, messager).make(filer, roundEnvironment);
+        new FileMaker(typeUtils, elementUtils, messager, moduleName).make(filer, roundEnvironment);
         return false;
     }
 

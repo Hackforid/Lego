@@ -113,7 +113,7 @@ allprojects {
 Proguard
 
 ```
--keepnames class com.smilehacker.lego.LegoFactory
+-keepnames class com.smilehacker.lego.factory.*
 ```
 
 
@@ -234,6 +234,39 @@ DiffUtil需要实现两个方法：
    这是因为RecyclerView item更新的默认动画有alpha变化的效果，Lego提供一个``NoAlphaDefaultItemAnimator``来方便开发者直接去掉这个alpha动画，就没“白光一闪”的问题了。
 
    ``recyclerView.setItemAnimator(new NoAlphaDefaultItemAnimator());``
+
+
+
+
+## 多Module支持
+
+需要在每个module的build.gradle中配置moduleName
+
+```groovy
+buildscript {
+	...
+}
+
+apt {
+    arguments {
+		moduleName project.getName();
+    }
+}
+
+// Kotlin
+kapt {
+    arguments {
+        arg("moduleName", project.getName())
+    }
+}
+```
+
+Lego会自动生成LegoFactory_moduleName.class，您需要在合适位置手动调用
+
+```
+Lego.addFactory(LegoFactory_sample.class);
+```
+
 
 
 

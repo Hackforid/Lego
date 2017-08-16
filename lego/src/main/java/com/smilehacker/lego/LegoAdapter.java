@@ -4,10 +4,8 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.util.DiffUtil;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.ViewGroup;
 
-import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,16 +20,11 @@ public class LegoAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private List<LegoComponent> mComponents = new ArrayList<>();
     private List<Object> mModels = new ArrayList<>();
 
-    public static ILegoFactory legoFactory;
 
     private boolean mDiffUtilEnabled = false;
     private boolean mDiffUtilDetectMoves = true;
 
     private DiffCallback mDiffCallback = new DiffCallback();
-
-    {
-        init();
-    }
 
 
     public void register(LegoComponent component) {
@@ -60,7 +53,7 @@ public class LegoAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     public void notifyModelChanged(Object model) {
         for (int i = 0, len = mModels.size(); i < len; i++) {
             Object obj = mModels.get(i);
-            if (legoFactory.getModelIndex(obj).equals(legoFactory.getModelIndex(model))) {
+            if (Lego.legoFactoryProxy.getModelIndex(obj).equals(Lego.legoFactoryProxy.getModelIndex(model))) {
                 mModels.set(i, model);
                 notifyItemChanged(i);
                 break;
@@ -134,18 +127,6 @@ public class LegoAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     }
 
     @SuppressWarnings("unchecked")
-    private static void init() {
-        if (legoFactory == null) {
-            Class factoryClass;
-            try {
-                factoryClass = Class.forName("com.smilehacker.lego.LegoFactory");
-                Constructor<?> constructor = factoryClass.getDeclaredConstructor();
-                legoFactory = (ILegoFactory) constructor.newInstance();
-            } catch (Exception e) {
-                Log.e(TAG, "method error", e);
-            }
-        }
-    }
 
     public static void removeDuplication(List list) {
         for (int i = 0; i < list.size() - 1; i++) {
@@ -153,8 +134,8 @@ public class LegoAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                 if (list.get(j).equals(list.get(i))) {
                     list.remove(j);
                 }
-                if (legoFactory.getModelIndex(list.get(i))
-                        .equals(legoFactory.getModelIndex(list.get(j)))) {
+                if (Lego.legoFactoryProxy.getModelIndex(list.get(i))
+                        .equals(Lego.legoFactoryProxy.getModelIndex(list.get(j)))) {
                     list.remove(j);
                 }
             }
@@ -188,8 +169,8 @@ public class LegoAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         public boolean areItemsTheSame(int oldItemPosition, int newItemPosition) {
             Object oldModel = mOldModels.get(oldItemPosition);
             Object newModel = mNewModels.get(newItemPosition);
-            Object oldIndex = legoFactory.getModelIndex(oldModel);
-            Object newIndex = legoFactory.getModelIndex(newModel);
+            Object oldIndex = Lego.legoFactoryProxy.getModelIndex(oldModel);
+            Object newIndex = Lego.legoFactoryProxy.getModelIndex(newModel);
             if (oldIndex != null && newIndex != null && oldIndex.equals(newIndex)) {
                 return true;
             }
@@ -200,7 +181,7 @@ public class LegoAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         public boolean areContentsTheSame(int oldItemPosition, int newItemPosition) {
             Object oldModel = mOldModels.get(oldItemPosition);
             Object newModel = mNewModels.get(newItemPosition);
-            return legoFactory.isModelEquals(oldModel, newModel);
+            return Lego.legoFactoryProxy.isModelEquals(oldModel, newModel);
         }
 
         @Nullable

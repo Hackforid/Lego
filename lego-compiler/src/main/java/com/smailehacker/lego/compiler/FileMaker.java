@@ -40,23 +40,29 @@ public class FileMaker {
     private Messager mMessager;
     private Elements mElements;
     private Types mTypes;
+    private String mModuleName;
 
-    public FileMaker(Types types, Elements elements, Messager messager) {
+    public FileMaker(Types types, Elements elements, Messager messager, String moduleName) {
         mTypes = types;
         mElements = elements;
         mMessager = messager;
+        mModuleName = moduleName;
     }
 
     public void make(Filer filer, RoundEnvironment roundEnvironment) {
         TypeName ILegoFactoryName = ClassName.get("com.smilehacker.lego", "ILegoFactory");
 
-        TypeSpec.Builder codeBuilder = TypeSpec.classBuilder("LegoFactory");
+        String className = "LegoFactory";
+        if (mModuleName != null && !mModuleName.isEmpty()) {
+            className = String.format("%s_%s", className, mModuleName);
+        }
+        TypeSpec.Builder codeBuilder = TypeSpec.classBuilder(className);
         codeBuilder.addModifiers(Modifier.PUBLIC, Modifier.FINAL);
         codeBuilder.addSuperinterface(ILegoFactoryName);
         codeBuilder.addMethod(getModelMethod(roundEnvironment));
         codeBuilder.addMethod(getModelIndexMethod(roundEnvironment));
         codeBuilder.addMethod(getMethodModelEquals(roundEnvironment));
-        JavaFile javaFile = JavaFile.builder("com.smilehacker.lego", codeBuilder.build()).build();
+        JavaFile javaFile = JavaFile.builder("com.smilehacker.lego.factory", codeBuilder.build()).build();
         try {
             javaFile.writeTo(filer);
         } catch (IOException e) {
