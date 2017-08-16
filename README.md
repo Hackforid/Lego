@@ -98,8 +98,8 @@ then
 apply plugin: 'android-apt'
 
 dependencies {
-    compile ('com.github.Hackforid.Lego:lego:0.2.7')
-    apt ('com.github.Hackforid.Lego:lego-compiler:0.2.7')
+    compile ('com.github.Hackforid.Lego:lego:0.3.0')
+    apt ('com.github.Hackforid.Lego:lego-compiler:0.3.0')
 }
 
 allprojects {
