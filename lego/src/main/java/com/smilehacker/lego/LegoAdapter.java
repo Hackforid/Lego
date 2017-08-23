@@ -51,13 +51,23 @@ public class LegoAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     }
 
     public void notifyModelChanged(Object model) {
-        for (int i = 0, len = mModels.size(); i < len; i++) {
-            Object obj = mModels.get(i);
-            if (Lego.legoFactoryProxy.getModelIndex(obj).equals(Lego.legoFactoryProxy.getModelIndex(model))) {
-                mModels.set(i, model);
-                notifyItemChanged(i);
-                break;
+        if (mDiffUtilEnabled) {
+            Object modelIndex = Lego.legoFactoryProxy.getModelIndex(model);
+            if (modelIndex == null) {
+                return;
             }
+            for (int i = 0, len = mModels.size(); i < len; i++) {
+                Object obj = mModels.get(i);
+                Object objIndex = Lego.legoFactoryProxy.getModelIndex(obj);
+                if (modelIndex.equals(objIndex)) {
+                    mModels.set(i, model);
+                    notifyItemChanged(i);
+                    break;
+                }
+            }
+        } else {
+            int index = mModels.indexOf(model);
+            notifyItemChanged(index);
         }
     }
 
