@@ -4,9 +4,11 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 
+import com.smilehacker.lego.Lego;
 import com.smilehacker.lego.util.NoAlphaDefaultItemAnimator;
 import com.smilehacker.lego.util.StickyHeaderRecyclerViewContainer;
 
@@ -47,6 +49,27 @@ public class MainActivity extends AppCompatActivity {
                 loadData();
             }
         });
+
+        Item0Component.Model model = new Item0Component.Model();
+        model.id = "aaa";
+        Log.d(TAG, "model index = " + Lego.legoFactoryProxy.getModelIndex(model, null));
+
+        Boolean b = true;
+        Log.d(TAG, "b hash = " + b.hashCode());
+        b = false;
+        Log.d(TAG, "b hash = " + b.hashCode());
+        List<String> a = new ArrayList<>();
+        Log.d(TAG, "a hash = " + a.hashCode());
+        a.add("aaa");
+        Log.d(TAG, "a hash = " + a.hashCode());
+        a.add("ccc");
+        Log.d(TAG, "a hash = " + a.hashCode());
+
+        model.id = "aaa";
+        Log.d(TAG, "model hash = " + model.hashCode());
+        model.id = "aaaaa";
+        Log.d(TAG, "model hash = " + model.hashCode());
+
     }
 
 
@@ -54,6 +77,7 @@ public class MainActivity extends AppCompatActivity {
         List<Object> models = new ArrayList<>();
         for (int i = 0; i < 30; i++) {
             Item0Component.Model model = new Item0Component.Model();
+            model.id = i + "";
             model.title = String.format("item %d", i);
             model.content = new Random().nextInt();
             models.add(model);

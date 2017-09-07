@@ -11,6 +11,7 @@ import com.squareup.javapoet.TypeSpec;
 
 import java.io.IOException;
 import java.lang.reflect.Array;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -109,15 +110,26 @@ public class FileMaker {
         return methodBuilder.build();
     }
 
+    class Pair<X, Y> {
+        public X first;
+        public Y second;
+        public Pair(X first, Y second) {
+            this.first = first;
+            this.second = second;
+        }
+    }
+
     private MethodSpec getModelIndexMethod(RoundEnvironment roundEnvironment) {
 
         MethodSpec.Builder builder = MethodSpec.methodBuilder("getModelIndex")
                 .addParameter(Object.class, "model")
+                .addParameter(Class.class, "clazz")
                 .addModifiers(Modifier.PUBLIC)
                 .addAnnotation(Override.class)
                 .returns(Object.class);
 
         boolean isCheckStart = false;
+
         for (Element annotatedElement: roundEnvironment.getElementsAnnotatedWith(LegoIndex.class)) {
             if (annotatedElement.getKind() != ElementKind.FIELD) {
                 error(annotatedElement, "Only field can be annotated with @%s", LegoIndex.class.getSimpleName());
@@ -127,9 +139,9 @@ public class FileMaker {
             TypeElement parent = (TypeElement) element.getEnclosingElement();
             if (!isCheckStart) {
                 isCheckStart = true;
-                builder.beginControlFlow("if ($T.class.equals(model.getClass()))", parent);
+                builder.beginControlFlow("if ($T.class.equals(clazz))", parent);
             } else {
-                builder.nextControlFlow("else if ($T.class.equals(model.getClass()))", parent);
+                builder.nextControlFlow("else if ($T.class.equals(clazz))", parent);
             }
             builder
                     .addStatement("return (($T) model).$N", parent, element.getSimpleName());
@@ -141,57 +153,6 @@ public class FileMaker {
         return builder.build();
     }
 
-
-    private MethodSpec getaMethodModelEquals(RoundEnvironment roundEnvironment) {
-        MethodSpec.Builder builder = MethodSpec.methodBuilder("isModelEquals")
-                .addParameter(Object.class, "model0")
-                .addParameter(Object.class, "model1")
-                .addModifiers(Modifier.PUBLIC)
-                .addAnnotation(Override.class)
-                .returns(int.class);
-        builder.beginControlFlow("if (!model0.getClass().equals(model1.getClass()))");
-        builder.addStatement("return -1");
-        builder.endControlFlow();
-
-        HashMap<TypeElement, List<VariableElement>> fieldMap = new HashMap<>();
-        for (Element annotatedElement: roundEnvironment.getElementsAnnotatedWith(LegoField.class)) {
-            if (annotatedElement.getKind() != ElementKind.FIELD) {
-                error(annotatedElement, "Only field can be annotated with @%s", LegoField.class.getSimpleName());
-                return null;
-            }
-            VariableElement element = (VariableElement) annotatedElement;
-            TypeElement parent = (TypeElement) element.getEnclosingElement();
-
-            List<VariableElement> list = fieldMap.get(parent);
-            if (list == null) {
-                list = new LinkedList<>();
-                fieldMap.put(parent, list);
-            }
-            list.add(element);
-        }
-
-        for (Map.Entry<TypeElement, List<VariableElement>> entry: fieldMap.entrySet()) {
-            TypeElement parent = entry.getKey();
-            builder.beginControlFlow("if ($T.class.equals(model0.getClass()))", parent);
-            builder.addStatement("$T m0 = ($T) model0", parent, parent);
-            builder.addStatement("$T m1 = ($T) model1", parent, parent);
-            for (VariableElement element: entry.getValue()) {
-                if (isPrimaryField(element)) {
-                    builder.beginControlFlow("if (m0.$N != m1.$N)", element.getSimpleName(), element.getSimpleName());
-                } else {
-                    Name name = element.getSimpleName();
-                    builder.beginControlFlow("if (m0.$N != null && m1.$N != null && !m0.$N.equals(m1.$N))", name, name, name, name);
-                }
-                builder.addStatement("return -1");
-                builder.endControlFlow();
-            }
-            builder.addStatement("return 1");
-            builder.endControlFlow();
-        }
-
-        builder.addStatement("return 0");
-        return builder.build();
-    }
 
     private boolean isPrimaryField(VariableElement element) {
         String type = element.asType().toString();
@@ -324,5 +285,110 @@ public class FileMaker {
                 Diagnostic.Kind.NOTE,
                 String.format(msg, args),
                 e);
+    }
+    private void log(String msg, Object... args) {
+        mMessager.printMessage(
+                Diagnostic.Kind.NOTE,
+                String.format(msg, args)
+                );
+    }
+
+    private MethodSpec getModelHash(RoundEnvironment roundEnvironment) {
+        MethodSpec.Builder builder = MethodSpec.methodBuilder("getModelHash")
+                .addParameter(Object.class, "model")
+                .addModifiers(Modifier.PUBLIC)
+                .addAnnotation(Override.class)
+                .returns(Integer.class);
+
+
+        builder.beginControlFlow("if (model == null)");
+        builder.addStatement("return 0");
+        builder.endControlFlow();
+
+        // if object is List
+        builder.beginControlFlow("if (model0 instanceof $T)", List.class);
+        builder.addStatement("$T m0 = ($T) model0", List.class, List.class);
+        builder.addStatement("$T m1 = ($T) model1", List.class, List.class);
+        builder.beginControlFlow("if (m0.size() != m1.size())");
+        builder.addStatement("return false");
+        builder.nextControlFlow("else");
+        builder.beginControlFlow("for(int i = 0, len = m0.size(); i < len; i++)");
+        builder.beginControlFlow("if (!isModelEquals(m0.get(i), m1.get(i)))");
+        builder.addStatement("return false");
+        builder.endControlFlow();
+        builder.addStatement("return true");
+        builder.endControlFlow();
+        builder.endControlFlow();
+        builder.endControlFlow();
+
+        // if object is Array
+        builder.beginControlFlow("if (model0.getClass().isArray())");
+        builder.addStatement("int len0 = $T.getLength(model0), len1 = $T.getLength(model1)", Array.class, Array.class);
+        builder.beginControlFlow("if (len0 != len1)");
+        builder.addStatement("return false");
+        builder.nextControlFlow("else");
+        builder.beginControlFlow("for(int i = 0; i < len0; i++)");
+        builder.beginControlFlow("if (!isModelEquals($T.get(model0, i), $T.get(model1, i)))", Array.class, Array.class);
+        builder.addStatement("return false");
+        builder.endControlFlow();
+        builder.addStatement("return true");
+        builder.endControlFlow();
+        builder.endControlFlow();
+        builder.endControlFlow();
+
+        HashMap<TypeElement, List<VariableElement>> fieldMap = new HashMap<>();
+        List<TypeElement> parents = new ArrayList<>();
+        for (Element annotatedElement: roundEnvironment.getElementsAnnotatedWith(LegoField.class)) {
+            if (annotatedElement.getKind() != ElementKind.FIELD) {
+                error(annotatedElement, "Only field can be annotated with @%s", LegoField.class.getSimpleName());
+                return null;
+            }
+            VariableElement element = (VariableElement) annotatedElement;
+            TypeElement parent = (TypeElement) element.getEnclosingElement();
+            builder.addStatement("// name = " + parent.getQualifiedName());
+            parents.add(parent);
+
+            List<VariableElement> list = fieldMap.get(parent);
+            if (list == null) {
+                list = new LinkedList<>();
+                fieldMap.put(parent, list);
+            }
+            list.add(element);
+        }
+
+        boolean isGenerateIf = false;
+        for (Map.Entry<TypeElement, List<VariableElement>> entry: fieldMap.entrySet()) {
+            TypeElement parent = entry.getKey();
+            if (!isGenerateIf) {
+                isGenerateIf = true;
+                builder.beginControlFlow("if ($T.class.equals(model0.getClass()))", parent);
+            } else {
+                builder.nextControlFlow("else if ($T.class.equals(model0.getClass()))", parent);
+            }
+            builder.addStatement("$T m0 = ($T) model0", parent, parent);
+            builder.addStatement("$T m1 = ($T) model1", parent, parent);
+
+            for (VariableElement element: entry.getValue()) {
+                Name name = element.getSimpleName();
+                if (isPrimaryField(element)) {
+                    builder.beginControlFlow("if (m0.$N != m1.$N)", name, name);
+                    builder.addStatement("return false");
+                    builder.endControlFlow();
+                } else {
+                    builder.beginControlFlow("if (!isModelEquals(m0.$N, m1.$N))", name, name);
+                    builder.addStatement("return false");
+                    builder.endControlFlow();
+                }
+            }
+            TypeElement superEle = (TypeElement) parent.getEnclosingElement();
+            builder.addStatement("return true");
+        }
+        if (isGenerateIf) {
+            builder.endControlFlow();
+        }
+
+        // generate default equal
+        builder.addStatement("return model0.equals(model1)");
+        return builder.build();
     }
 }

@@ -45,12 +45,20 @@ public class Item0Component extends LegoComponent<Item0Component.ViewHolder, Ite
         }
     }
 
-    public static class Model {
-        @LegoIndex
+    public static class Model extends Base {
+        @LegoField
         public String title;
 
         @LegoField
         public int content;
+    }
+
+    public static class Base {
+        @LegoIndex
+        public String id;
+
+        @LegoField
+        public String desc;
     }
 
 }

@@ -52,13 +52,13 @@ public class LegoAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     public void notifyModelChanged(Object model) {
         if (mDiffUtilEnabled) {
-            Object modelIndex = Lego.legoFactoryProxy.getModelIndex(model);
+            Object modelIndex = Lego.legoFactoryProxy.getModelIndex(model, null);
             if (modelIndex == null) {
                 return;
             }
             for (int i = 0, len = mModels.size(); i < len; i++) {
                 Object obj = mModels.get(i);
-                Object objIndex = Lego.legoFactoryProxy.getModelIndex(obj);
+                Object objIndex = Lego.legoFactoryProxy.getModelIndex(obj, null);
                 if (modelIndex.equals(objIndex)) {
                     mModels.set(i, model);
                     notifyItemChanged(i);
@@ -144,8 +144,8 @@ public class LegoAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                 if (list.get(j).equals(list.get(i))) {
                     list.remove(j);
                 }
-                if (Lego.legoFactoryProxy.getModelIndex(list.get(i))
-                        .equals(Lego.legoFactoryProxy.getModelIndex(list.get(j)))) {
+                if (Lego.legoFactoryProxy.getModelIndex(list.get(i), null)
+                        .equals(Lego.legoFactoryProxy.getModelIndex(list.get(j), null))) {
                     list.remove(j);
                 }
             }
@@ -179,8 +179,8 @@ public class LegoAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         public boolean areItemsTheSame(int oldItemPosition, int newItemPosition) {
             Object oldModel = mOldModels.get(oldItemPosition);
             Object newModel = mNewModels.get(newItemPosition);
-            Object oldIndex = Lego.legoFactoryProxy.getModelIndex(oldModel);
-            Object newIndex = Lego.legoFactoryProxy.getModelIndex(newModel);
+            Object oldIndex = Lego.legoFactoryProxy.getModelIndex(oldModel, null);
+            Object newIndex = Lego.legoFactoryProxy.getModelIndex(newModel, null);
             if (oldIndex != null && newIndex != null && oldIndex.equals(newIndex)) {
                 return true;
             }

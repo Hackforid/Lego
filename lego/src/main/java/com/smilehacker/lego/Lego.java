@@ -39,7 +39,7 @@ public final class Lego {
         }
     }
 
-    protected static ILegoFactory legoFactoryProxy = new ILegoFactory() {
+    public static ILegoFactory legoFactoryProxy = new ILegoFactory() {
         @Override
         public Class getModelClass(LegoComponent component) {
             for (ILegoFactory legoFactory: mLegoFactories) {
@@ -52,12 +52,19 @@ public final class Lego {
         }
 
         @Override
-        public Object getModelIndex(Object model) {
+        public Object getModelIndex(Object model, Class clazz) {
+            if (clazz == null) {
+                clazz = model.getClass();
+            }
             for (ILegoFactory legoFactory: mLegoFactories) {
-                Object index = legoFactory.getModelIndex(model);
+                Object index = legoFactory.getModelIndex(model, clazz);
                 if (index != null) {
                     return index;
                 }
+            }
+            Class superClass = clazz.getSuperclass();
+            if (superClass != null) {
+                return getModelIndex(model, superClass);
             }
             return null;
         }
