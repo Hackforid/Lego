@@ -14,11 +14,12 @@ buildscript {
 
 allprojects {
     repositories {
-        mavenLocal()
         maven { url 'http://maven.aliyun.com/nexus/#nexus-search;quick~netty-all' }
+        google()
+        jcenter()
+        mavenLocal()
         maven { url "http://oss.sonatype.org/content/repositories/snapshots/" }
         maven { url "https://jitpack.io" }
-        jcenter()
     }
 }
 

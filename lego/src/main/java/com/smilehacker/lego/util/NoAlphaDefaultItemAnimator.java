@@ -16,17 +16,18 @@
 package com.smilehacker.lego.util;
 
 import android.support.annotation.NonNull;
-import android.support.v4.animation.AnimatorCompatHelper;
 import android.support.v4.view.ViewCompat;
 import android.support.v4.view.ViewPropertyAnimatorCompat;
 import android.support.v4.view.ViewPropertyAnimatorListener;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.RecyclerView.ViewHolder;
 import android.support.v7.widget.SimpleItemAnimator;
-import android.support.v7.widget.RecyclerView;
-
 import android.view.View;
+
 import java.util.ArrayList;
 import java.util.List;
+
+//import android.support.v4.animation.AnimatorCompatHelper;
 
 /**
  * This implementation of {@link RecyclerView.ItemAnimator} provides basic
@@ -514,7 +515,7 @@ public class NoAlphaDefaultItemAnimator extends SimpleItemAnimator {
     }
 
     private void resetAnimation(ViewHolder holder) {
-        AnimatorCompatHelper.clearInterpolator(holder.itemView);
+        holder.itemView.clearAnimation();
         endAnimation(holder);
     }
 
