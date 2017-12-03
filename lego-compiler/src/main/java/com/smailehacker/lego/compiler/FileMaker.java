@@ -3,6 +3,7 @@ package com.smailehacker.lego.compiler;
 import com.smilehacker.lego.annotation.Component;
 import com.smilehacker.lego.annotation.LegoField;
 import com.smilehacker.lego.annotation.LegoIndex;
+import com.squareup.javapoet.ArrayTypeName;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.JavaFile;
 import com.squareup.javapoet.MethodSpec;
@@ -13,9 +14,11 @@ import java.io.IOException;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.annotation.processing.Filer;
 import javax.annotation.processing.Messager;
@@ -60,10 +63,11 @@ public class FileMaker {
         TypeSpec.Builder codeBuilder = TypeSpec.classBuilder(className);
         codeBuilder.addModifiers(Modifier.PUBLIC, Modifier.FINAL);
         codeBuilder.addSuperinterface(ILegoFactoryName);
-        codeBuilder.addMethod(getModelMethod(roundEnvironment));
+//        codeBuilder.addMethod(getModelMethod(roundEnvironment));
         codeBuilder.addMethod(getModelIndexMethod(roundEnvironment));
         codeBuilder.addMethod(getMethodModelEquals(roundEnvironment));
         codeBuilder.addMethod(getModelHash(roundEnvironment));
+        codeBuilder.addMethod(getDefineModels(roundEnvironment));
         JavaFile javaFile = JavaFile.builder("com.smilehacker.lego.factory", codeBuilder.build()).build();
         try {
             javaFile.writeTo(filer);
@@ -316,16 +320,14 @@ public class FileMaker {
             }
             VariableElement element = (VariableElement) annotatedElement;
             TypeElement parent = (TypeElement) element.getEnclosingElement();
-            //builder.addStatement("// name = " + parent.getQualifiedName());
-            parents.add(parent);
 
             List<VariableElement> list = fieldMap.get(parent);
             if (list == null) {
+                parents.add(parent);
                 list = new LinkedList<>();
                 fieldMap.put(parent, list);
                 parentsName.add(parent.getQualifiedName().toString());
             }
-            list.add(element);
         }
 
         // check start
@@ -376,6 +378,35 @@ public class FileMaker {
 
         builder.addStatement("return -1d");
 
+        return builder.build();
+    }
+
+    private MethodSpec getDefineModels(RoundEnvironment roundEnvironment) {
+        MethodSpec.Builder builder = MethodSpec.methodBuilder("getDefineModels")
+                .addModifiers(Modifier.PUBLIC)
+                .addAnnotation(Override.class)
+                .returns(ArrayTypeName.of(Class.class));
+        Class[] a = new Class[] {String.class};
+
+
+
+        Set<TypeElement> parents = new HashSet<>();
+        for (Element annotatedElement: roundEnvironment.getElementsAnnotatedWith(LegoField.class)) {
+            if (annotatedElement.getKind() != ElementKind.FIELD) {
+                error(annotatedElement, "Only field can be annotated with @%s", LegoField.class.getSimpleName());
+                return null;
+            }
+            VariableElement element = (VariableElement) annotatedElement;
+            TypeElement parent = (TypeElement) element.getEnclosingElement();
+            parents.add(parent);
+        }
+
+        builder.addCode("return new $T[] {", Class.class);
+        for (TypeElement element: parents) {
+            builder.addCode("$T.class,", element);
+        }
+
+        builder.addCode("};");
         return builder.build();
     }
 }

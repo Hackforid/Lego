@@ -40,16 +40,6 @@ public final class Lego {
     }
 
     public static ILegoFactory legoFactoryProxy = new ILegoFactory() {
-        @Override
-        public Class getModelClass(LegoComponent component) {
-            for (ILegoFactory legoFactory: mLegoFactories) {
-                Class clazz = legoFactory.getModelClass(component);
-                if (clazz != null) {
-                    return clazz;
-                }
-            }
-            return null;
-        }
 
         @Override
         public Object getModelIndex(Object model, Class clazz) {
@@ -89,6 +79,11 @@ public final class Lego {
                 }
             }
             return 0;
+        }
+
+        @Override
+        public Class[] getDefineModels() {
+            return null;
         }
     };
 }

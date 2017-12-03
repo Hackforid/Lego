@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 
@@ -57,6 +58,12 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        B b = new B();
+        Log.d(TAG, "b class = " + b.getClass());
+        A a = (A) b;
+        Log.d(TAG, "a class = " + a.getClass());
+
+
     }
     List<Item0Component.Model> models = new ArrayList<>();
 
@@ -108,4 +115,12 @@ public class MainActivity extends AppCompatActivity {
         public Test0 c;
     }
 
+
+    class A {
+        int a = 1;
+    }
+
+    class B extends A {
+        int b = 2;
+    }
 }

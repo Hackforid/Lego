@@ -6,11 +6,11 @@ package com.smilehacker.lego;
 
 public interface ILegoFactory {
 
-    Class getModelClass(LegoComponent component);
-
     Object getModelIndex(Object model, Class clazz);
 
     boolean isModelEquals(Object model0, Object model1);
 
     double getModelHash(Object m);
+
+    Class[] getDefineModels();
 }

@@ -51,6 +51,9 @@ public class Item0Component extends LegoComponent<Item0Component.ViewHolder, Ite
 
         @LegoField
         public int content;
+
+        @LegoField
+        public int text;
     }
 
     public static class Base {
