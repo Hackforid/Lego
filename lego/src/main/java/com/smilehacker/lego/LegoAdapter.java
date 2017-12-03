@@ -26,6 +26,7 @@ public class LegoAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private boolean mDiffUtilEnabled = false;
     private boolean mDiffUtilDetectMoves = true;
     private boolean mModelHashEnabled = false;
+    private boolean mDiffInheritance = false;
 
     private DiffCallback mDiffCallback = new DiffCallback();
 
@@ -84,6 +85,10 @@ public class LegoAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     public void setModelHashEnabled(boolean modelHashEnabled) {
         mModelHashEnabled = modelHashEnabled;
+    }
+
+    public void setDiffInheritance(boolean diffInheritance) {
+        mDiffInheritance = diffInheritance;
     }
 
     private void diffNotifyDataSetChanged(List<Object> newList) {
@@ -214,7 +219,11 @@ public class LegoAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                 }
 
             }
-            return Lego.legoFactoryProxy.isModelEquals(oldModel, newModel);
+            if (!mDiffInheritance) {
+                return Lego.legoFactoryProxy.isModelEquals(oldModel, newModel);
+            } else {
+                return Lego.isModelEqualsExtend(oldModel, newModel);
+            }
         }
 
         private double safeToDouble(Double obj) {

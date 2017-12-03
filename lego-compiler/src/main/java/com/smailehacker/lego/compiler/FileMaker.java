@@ -68,6 +68,7 @@ public class FileMaker {
         codeBuilder.addMethod(getMethodModelEquals(roundEnvironment));
         codeBuilder.addMethod(getModelHash(roundEnvironment));
         codeBuilder.addMethod(getDefineModels(roundEnvironment));
+        codeBuilder.addMethod(getMethodModelEqualsByClass(roundEnvironment));
         JavaFile javaFile = JavaFile.builder("com.smilehacker.lego.factory", codeBuilder.build()).build();
         try {
             javaFile.writeTo(filer);
@@ -226,55 +227,8 @@ public class FileMaker {
             builder.endControlFlow();
         builder.endControlFlow();
 
-        HashMap<TypeElement, List<VariableElement>> fieldMap = new HashMap<>();
-        for (Element annotatedElement: roundEnvironment.getElementsAnnotatedWith(LegoField.class)) {
-            if (annotatedElement.getKind() != ElementKind.FIELD) {
-                error(annotatedElement, "Only field can be annotated with @%s", LegoField.class.getSimpleName());
-                return null;
-            }
-            VariableElement element = (VariableElement) annotatedElement;
-            TypeElement parent = (TypeElement) element.getEnclosingElement();
+        builder.addStatement("return isModelEquals(model0, model1, model0.getClass())");
 
-            List<VariableElement> list = fieldMap.get(parent);
-            if (list == null) {
-                list = new LinkedList<>();
-                fieldMap.put(parent, list);
-            }
-            list.add(element);
-        }
-
-        boolean isGenerateIf = false;
-        for (Map.Entry<TypeElement, List<VariableElement>> entry: fieldMap.entrySet()) {
-            TypeElement parent = entry.getKey();
-            if (!isGenerateIf) {
-                isGenerateIf = true;
-                builder.beginControlFlow("if ($T.class.equals(model0.getClass()))", parent);
-            } else {
-                builder.nextControlFlow("else if ($T.class.equals(model0.getClass()))", parent);
-            }
-            builder.addStatement("$T m0 = ($T) model0", parent, parent);
-            builder.addStatement("$T m1 = ($T) model1", parent, parent);
-
-            for (VariableElement element: entry.getValue()) {
-                Name name = element.getSimpleName();
-                if (isPrimaryField(element)) {
-                    builder.beginControlFlow("if (m0.$N != m1.$N)", name, name);
-                    builder.addStatement("return false");
-                    builder.endControlFlow();
-                } else {
-                    builder.beginControlFlow("if (!isModelEquals(m0.$N, m1.$N))", name, name);
-                    builder.addStatement("return false");
-                    builder.endControlFlow();
-                }
-            }
-            builder.addStatement("return true");
-        }
-        if (isGenerateIf) {
-            builder.endControlFlow();
-        }
-
-        // generate default equal
-        builder.addStatement("return model0.equals(model1)");
         return builder.build();
     }
 
@@ -328,6 +282,7 @@ public class FileMaker {
                 fieldMap.put(parent, list);
                 parentsName.add(parent.getQualifiedName().toString());
             }
+            list.add(element);
         }
 
         // check start
@@ -407,6 +362,68 @@ public class FileMaker {
         }
 
         builder.addCode("};");
+        return builder.build();
+    }
+
+    private MethodSpec getMethodModelEqualsByClass(RoundEnvironment roundEnvironment) {
+        MethodSpec.Builder builder = MethodSpec.methodBuilder("isModelEquals")
+                .addParameter(Object.class, "model0")
+                .addParameter(Object.class, "model1")
+                .addParameter(Class.class, "clazz")
+                .addModifiers(Modifier.PUBLIC)
+                .addAnnotation(Override.class)
+                .returns(boolean.class);
+
+
+        HashMap<TypeElement, List<VariableElement>> fieldMap = new HashMap<>();
+        for (Element annotatedElement: roundEnvironment.getElementsAnnotatedWith(LegoField.class)) {
+            if (annotatedElement.getKind() != ElementKind.FIELD) {
+                error(annotatedElement, "Only field can be annotated with @%s", LegoField.class.getSimpleName());
+                return null;
+            }
+            VariableElement element = (VariableElement) annotatedElement;
+            TypeElement parent = (TypeElement) element.getEnclosingElement();
+
+            List<VariableElement> list = fieldMap.get(parent);
+            if (list == null) {
+                list = new LinkedList<>();
+                fieldMap.put(parent, list);
+            }
+            list.add(element);
+        }
+
+        boolean isGenerateIf = false;
+        for (Map.Entry<TypeElement, List<VariableElement>> entry: fieldMap.entrySet()) {
+            TypeElement parent = entry.getKey();
+            if (!isGenerateIf) {
+                isGenerateIf = true;
+                builder.beginControlFlow("if ($T.class.equals(clazz))", parent);
+            } else {
+                builder.nextControlFlow("else if ($T.class.equals(clazz))", parent);
+            }
+            builder.addStatement("$T m0 = ($T) model0", parent, parent);
+            builder.addStatement("$T m1 = ($T) model1", parent, parent);
+
+            for (VariableElement element: entry.getValue()) {
+                Name name = element.getSimpleName();
+                if (isPrimaryField(element)) {
+                    builder.beginControlFlow("if (m0.$N != m1.$N)", name, name);
+                    builder.addStatement("return false");
+                    builder.endControlFlow();
+                } else {
+                    builder.beginControlFlow("if (!isModelEquals(m0.$N, m1.$N))", name, name);
+                    builder.addStatement("return false");
+                    builder.endControlFlow();
+                }
+            }
+            builder.addStatement("return true");
+        }
+        if (isGenerateIf) {
+            builder.endControlFlow();
+        }
+
+        // generate default equal
+        builder.addStatement("return model0.equals(model1)");
         return builder.build();
     }
 }

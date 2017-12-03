@@ -4,10 +4,10 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 
+import com.smilehacker.lego.Lego;
 import com.smilehacker.lego.annotation.LegoField;
 import com.smilehacker.lego.annotation.LegoIndex;
 import com.smilehacker.lego.util.NoAlphaDefaultItemAnimator;
@@ -58,10 +58,16 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        B b = new B();
-        Log.d(TAG, "b class = " + b.getClass());
-        A a = (A) b;
-        Log.d(TAG, "a class = " + a.getClass());
+//        B b = new B();
+//        B c= new B();
+//        Log.d(TAG, "b class = " + b.getClass() + " " + b.getClass().hashCode() + " " + c.getClass().hashCode());
+//        A a = new A();
+//        Log.d(TAG, "a class = " + a.getClass());
+//        Log.d(TAG, "class a = b" + a.getClass().equals(b.getClass()));
+//        Log.d(TAG, "class a = b" + (b instanceof A));
+//        Log.d(TAG, "a is b " + a.getClass().isAssignableFrom(b.getClass()));
+//        Log.d(TAG, "b is a" + b.getClass().isAssignableFrom(a.getClass()));
+        Lego.isModelEqualsExtend(models.get(0), models.get(1));
 
 
     }
@@ -70,6 +76,7 @@ public class MainActivity extends AppCompatActivity {
     private void testModelHash() {
         for (int i = 0; i < 30; i++) {
             Item0Component.Model model = new Item0Component.Model();
+            model.index = i;
             model.id = i + "";
             model.title = String.format("item %d", i);
             model.content = new Random().nextInt();

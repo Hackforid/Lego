@@ -10,6 +10,8 @@ public interface ILegoFactory {
 
     boolean isModelEquals(Object model0, Object model1);
 
+    boolean isModelEquals(Object model0, Object model1, Class clazz);
+
     double getModelHash(Object m);
 
     Class[] getDefineModels();

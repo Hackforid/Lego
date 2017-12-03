@@ -11,7 +11,8 @@ import com.smilehacker.lego.LegoAdapter;
 public class TestAdapter extends LegoAdapter {
     public TestAdapter(Context context) {
         setDiffUtilEnabled(true);
-        setModelHashEnabled(true);
+        //setModelHashEnabled(true);
+        setDiffInheritance(true);
         Item0Component item0 = new Item0Component(context);
         register(item0);
         register(new Item1Component(context));
