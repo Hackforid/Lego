@@ -1,5 +1,5 @@
 apply plugin: 'com.android.application'
-apply plugin: 'com.neenbedankt.android-apt'
+//apply plugin: 'com.neenbedankt.android-apt'
 
 android {
     compileSdkVersion 26
@@ -11,6 +11,11 @@ android {
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        javaCompileOptions {
+            annotationProcessorOptions {
+                includeCompileClasspath false
+            }
+        }
     }
     buildTypes {
         release {
@@ -27,11 +32,11 @@ android {
     }
 }
 
-apt {
-    arguments {
-        //moduleName project.getName()
-    }
-}
+//apt {
+//    arguments {
+//        //moduleName project.getName()
+//    }
+//}
 
 
 dependencies {
@@ -43,7 +48,7 @@ dependencies {
     testCompile 'junit:junit:4.12'
     compile "com.android.support:recyclerview-v7:26.1.0"
     compile project(":lego")
-    apt project(":lego-compiler")
+    annotationProcessor project(":lego-compiler")
 }
 
 repositories {

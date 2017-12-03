@@ -6,7 +6,3 @@ group='com.github.Hackforid'
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
 }
-
-// todo remove it
-sourceCompatibility = "1.7"
-targetCompatibility = "1.7"

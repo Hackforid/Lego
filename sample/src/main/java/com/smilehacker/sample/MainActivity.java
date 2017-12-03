@@ -4,11 +4,11 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 
-import com.smilehacker.lego.Lego;
+import com.smilehacker.lego.annotation.LegoField;
+import com.smilehacker.lego.annotation.LegoIndex;
 import com.smilehacker.lego.util.NoAlphaDefaultItemAnimator;
 import com.smilehacker.lego.util.StickyHeaderRecyclerViewContainer;
 
@@ -23,6 +23,7 @@ public class MainActivity extends AppCompatActivity {
     private TestAdapter mAdapter;
     private Button mBtn;
     private StickyHeaderRecyclerViewContainer mContainer;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,35 +42,35 @@ public class MainActivity extends AppCompatActivity {
         mRv.setItemAnimator(new NoAlphaDefaultItemAnimator());
         mContainer.addHeaderViewType(new Item1Component(this).getViewType());
 
-        loadData();
+        testModelHash();
+        //loadData();
 
         mBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                loadData();
+                models.get(0).title = "aaa" + System.currentTimeMillis();
+                List<Object> r = new ArrayList<>();
+                r.addAll(models);
+                mAdapter.commitData(r);
+
+                //loadData();
             }
         });
 
-        Item0Component.Model model = new Item0Component.Model();
-        model.id = "aaa";
-        Log.d(TAG, "model index = " + Lego.legoFactoryProxy.getModelIndex(model, null));
+    }
+    List<Item0Component.Model> models = new ArrayList<>();
 
-        Boolean b = true;
-        Log.d(TAG, "b hash = " + b.hashCode());
-        b = false;
-        Log.d(TAG, "b hash = " + b.hashCode());
-        List<String> a = new ArrayList<>();
-        Log.d(TAG, "a hash = " + a.hashCode());
-        a.add("aaa");
-        Log.d(TAG, "a hash = " + a.hashCode());
-        a.add("ccc");
-        Log.d(TAG, "a hash = " + a.hashCode());
-
-        model.id = "aaa";
-        Log.d(TAG, "model hash = " + model.hashCode());
-        model.id = "aaaaa";
-        Log.d(TAG, "model hash = " + model.hashCode());
-
+    private void testModelHash() {
+        for (int i = 0; i < 30; i++) {
+            Item0Component.Model model = new Item0Component.Model();
+            model.id = i + "";
+            model.title = String.format("item %d", i);
+            model.content = new Random().nextInt();
+            models.add(model);
+        }
+        List<Object> r = new ArrayList<>();
+        r.addAll(models);
+        mAdapter.commitData(r);
     }
 
 
@@ -94,5 +95,17 @@ public class MainActivity extends AppCompatActivity {
         mAdapter.commitData(models);
     }
 
+    public class Test0 {
+        @LegoIndex
+        public int a = 1;
+        @LegoField
+        public String b = "";
+    }
+    public class Test1 {
+        @LegoIndex
+        public int a = 1;
+        @LegoField
+        public Test0 c;
+    }
 
 }

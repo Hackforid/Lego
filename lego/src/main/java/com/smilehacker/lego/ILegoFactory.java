@@ -11,4 +11,6 @@ public interface ILegoFactory {
     Object getModelIndex(Object model, Class clazz);
 
     boolean isModelEquals(Object model0, Object model1);
+
+    double getModelHash(Object m);
 }

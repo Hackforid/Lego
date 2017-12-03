@@ -1,5 +1,6 @@
 package com.smilehacker.lego;
 
+import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.ViewGroup;
 
@@ -13,9 +14,9 @@ import java.util.List;
 
 public abstract class LegoComponent<V extends RecyclerView.ViewHolder, M> {
 
-    public abstract V getViewHolder(ViewGroup container);
+    public abstract V getViewHolder(@NonNull ViewGroup container);
 
-    public abstract void onBindData(V viewHolder, M model);
+    public abstract void onBindData(@NonNull V viewHolder, @NonNull M model);
 
     private Class mModelClass;
 
@@ -39,7 +40,7 @@ public abstract class LegoComponent<V extends RecyclerView.ViewHolder, M> {
      *        item at the given position in the data set.
      * @param position The position of the item within the adapter's data set.
      */
-    public void onBindData(V viewHolder, M model, List<Object> payloads) {
+    public void onBindData(@NonNull V viewHolder, @NonNull M model, List<Object> payloads) {
         onBindData(viewHolder, model);
     }
 
@@ -47,7 +48,7 @@ public abstract class LegoComponent<V extends RecyclerView.ViewHolder, M> {
         return this.getClass().hashCode();
     }
 
-    public Object getChangePayload(M oldModel, M newModel) {
+    public Object getChangePayload(@NonNull M oldModel, @NonNull M newModel) {
         return null;
     }
 

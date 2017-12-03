@@ -79,5 +79,16 @@ public final class Lego {
             }
             return false;
         }
+
+        @Override
+        public double getModelHash(Object m) {
+            for (ILegoFactory legoFactory: mLegoFactories) {
+                double r = legoFactory.getModelHash(m);
+                if (r != -1) {
+                    return r;
+                }
+            }
+            return 0;
+        }
     };
 }

@@ -8,6 +8,7 @@ import android.view.ViewGroup;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.WeakHashMap;
 
 /**
  * Created by zhouquan on 17/2/18.
@@ -21,8 +22,10 @@ public class LegoAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private List<Object> mModels = new ArrayList<>();
 
 
+
     private boolean mDiffUtilEnabled = false;
     private boolean mDiffUtilDetectMoves = true;
+    private boolean mModelHashEnabled = false;
 
     private DiffCallback mDiffCallback = new DiffCallback();
 
@@ -77,6 +80,10 @@ public class LegoAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     public void setDiffUtilDetectMoves(boolean detectMoves) {
         mDiffUtilDetectMoves = detectMoves;
+    }
+
+    public void setModelHashEnabled(boolean modelHashEnabled) {
+        mModelHashEnabled = modelHashEnabled;
     }
 
     private void diffNotifyDataSetChanged(List<Object> newList) {
@@ -154,6 +161,8 @@ public class LegoAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     private class DiffCallback extends DiffUtil.Callback {
 
+        private WeakHashMap<Object, Double> mModelHashMap = new WeakHashMap<>();
+
         private List<Object> mOldModels;
         private List<Object> mNewModels;
 
@@ -163,6 +172,11 @@ public class LegoAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
         public void setNewModels(List<Object> models) {
             mNewModels = models;
+            for (Object model : models) {
+                if (mModelHashMap.get(model) == null) {
+                    mModelHashMap.put(model, Lego.legoFactoryProxy.getModelHash(model));
+                }
+            }
         }
 
         @Override
@@ -191,7 +205,24 @@ public class LegoAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         public boolean areContentsTheSame(int oldItemPosition, int newItemPosition) {
             Object oldModel = mOldModels.get(oldItemPosition);
             Object newModel = mNewModels.get(newItemPosition);
+            if (oldModel == newModel && mModelHashEnabled) {
+                double oldHash = safeToDouble(mModelHashMap.get(oldModel));
+                double newHash = safeToDouble(Lego.legoFactoryProxy.getModelHash(newModel));
+                mModelHashMap.put(newModel, newHash);
+                if (oldHash != -1 && newHash != -1) {
+                    return oldHash == newHash;
+                }
+
+            }
             return Lego.legoFactoryProxy.isModelEquals(oldModel, newModel);
+        }
+
+        private double safeToDouble(Double obj) {
+            if (obj == null) {
+                return -1;
+            } else {
+                return obj;
+            }
         }
 
         @Nullable
@@ -207,6 +238,7 @@ public class LegoAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             return super.getChangePayload(oldItemPosition, newItemPosition);
         }
     }
+
 
     public LegoComponent getComponentByModel(Object model) {
         for (LegoComponent component: mComponents) {
