@@ -25,7 +25,7 @@ public class LegoAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     private boolean mDiffUtilEnabled = false;
     private boolean mDiffUtilDetectMoves = true;
-    private boolean mModelHashEnabled = false;
+    private boolean mDiffModelHashEnabled = false;
     private boolean mDiffInheritance = false;
 
     private DiffCallback mDiffCallback = new DiffCallback();
@@ -83,8 +83,8 @@ public class LegoAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         mDiffUtilDetectMoves = detectMoves;
     }
 
-    public void setModelHashEnabled(boolean modelHashEnabled) {
-        mModelHashEnabled = modelHashEnabled;
+    public void setDiffModelHashEnabled(boolean modelHashEnabled) {
+        mDiffModelHashEnabled = modelHashEnabled;
     }
 
     public void setDiffInheritance(boolean diffInheritance) {
@@ -198,8 +198,8 @@ public class LegoAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         public boolean areItemsTheSame(int oldItemPosition, int newItemPosition) {
             Object oldModel = mOldModels.get(oldItemPosition);
             Object newModel = mNewModels.get(newItemPosition);
-            Object oldIndex = Lego.legoFactoryProxy.getModelIndex(oldModel, null);
-            Object newIndex = Lego.legoFactoryProxy.getModelIndex(newModel, null);
+            Object oldIndex = mDiffInheritance ? Lego.getModelIndexInheritance(oldModel) : Lego.legoFactoryProxy.getModelIndex(oldModel, null);
+            Object newIndex = mDiffInheritance ? Lego.getModelIndexInheritance(newModel) : Lego.legoFactoryProxy.getModelIndex(newModel, null);
             if (oldIndex != null && newIndex != null && oldIndex.equals(newIndex)) {
                 return true;
             }
@@ -210,9 +210,10 @@ public class LegoAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         public boolean areContentsTheSame(int oldItemPosition, int newItemPosition) {
             Object oldModel = mOldModels.get(oldItemPosition);
             Object newModel = mNewModels.get(newItemPosition);
-            if (oldModel == newModel && mModelHashEnabled) {
+            if (oldModel == newModel && mDiffModelHashEnabled) {
                 double oldHash = safeToDouble(mModelHashMap.get(oldModel));
-                double newHash = safeToDouble(Lego.legoFactoryProxy.getModelHash(newModel));
+                double newHash =
+                        mDiffInheritance ? Lego.getModelHashWithInheritance(newModel) : Lego.legoFactoryProxy.getModelHash(newModel);
                 mModelHashMap.put(newModel, newHash);
                 if (oldHash != -1 && newHash != -1) {
                     return oldHash == newHash;
@@ -222,7 +223,7 @@ public class LegoAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             if (!mDiffInheritance) {
                 return Lego.legoFactoryProxy.isModelEquals(oldModel, newModel);
             } else {
-                return Lego.isModelEqualsExtend(oldModel, newModel);
+                return Lego.isModelEqualsInheritance(oldModel, newModel);
             }
         }
 

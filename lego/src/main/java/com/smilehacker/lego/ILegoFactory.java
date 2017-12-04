@@ -14,5 +14,7 @@ public interface ILegoFactory {
 
     double getModelHash(Object m);
 
+    double getModelHash(Object m, Class clazz);
+
     Class[] getDefineModels();
 }

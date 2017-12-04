@@ -32,7 +32,7 @@ public class Item0Component extends LegoComponent<Item0Component.ViewHolder, Ite
 
     @Override
     public void onBindData(ViewHolder viewHolder, Model model) {
-        viewHolder.title.setText(model.title);
+        viewHolder.title.setText(model.desc);
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
@@ -46,7 +46,7 @@ public class Item0Component extends LegoComponent<Item0Component.ViewHolder, Ite
     }
 
     public static class Model extends Base {
-        @LegoIndex
+        @LegoField
         public int index;
         @LegoField
         public String title;
@@ -60,7 +60,7 @@ public class Item0Component extends LegoComponent<Item0Component.ViewHolder, Ite
 
     public static class Base {
         @LegoIndex
-        public String id;
+        public int id;
 
         @LegoField
         public String desc;

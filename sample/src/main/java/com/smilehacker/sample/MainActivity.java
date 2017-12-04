@@ -49,7 +49,7 @@ public class MainActivity extends AppCompatActivity {
         mBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                models.get(0).title = "aaa" + System.currentTimeMillis();
+                models.get(0).desc = "aaa" + System.currentTimeMillis();
                 List<Object> r = new ArrayList<>();
                 r.addAll(models);
                 mAdapter.commitData(r);
@@ -67,7 +67,7 @@ public class MainActivity extends AppCompatActivity {
 //        Log.d(TAG, "class a = b" + (b instanceof A));
 //        Log.d(TAG, "a is b " + a.getClass().isAssignableFrom(b.getClass()));
 //        Log.d(TAG, "b is a" + b.getClass().isAssignableFrom(a.getClass()));
-        Lego.isModelEqualsExtend(models.get(0), models.get(1));
+        Lego.isModelEqualsInheritance(models.get(0), models.get(1));
 
 
     }
@@ -76,9 +76,8 @@ public class MainActivity extends AppCompatActivity {
     private void testModelHash() {
         for (int i = 0; i < 30; i++) {
             Item0Component.Model model = new Item0Component.Model();
-            model.index = i;
-            model.id = i + "";
-            model.title = String.format("item %d", i);
+            model.id = i;
+            model.desc = String.format("item %d", i);
             model.content = new Random().nextInt();
             models.add(model);
         }
@@ -92,7 +91,6 @@ public class MainActivity extends AppCompatActivity {
         List<Object> models = new ArrayList<>();
         for (int i = 0; i < 30; i++) {
             Item0Component.Model model = new Item0Component.Model();
-            model.id = i + "";
             model.title = String.format("item %d", i);
             model.content = new Random().nextInt();
             models.add(model);

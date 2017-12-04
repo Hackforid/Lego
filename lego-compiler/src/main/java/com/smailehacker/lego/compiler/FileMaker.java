@@ -64,11 +64,12 @@ public class FileMaker {
         codeBuilder.addModifiers(Modifier.PUBLIC, Modifier.FINAL);
         codeBuilder.addSuperinterface(ILegoFactoryName);
 //        codeBuilder.addMethod(getModelMethod(roundEnvironment));
+        codeBuilder.addMethod(getDefineModels(roundEnvironment));
         codeBuilder.addMethod(getModelIndexMethod(roundEnvironment));
         codeBuilder.addMethod(getMethodModelEquals(roundEnvironment));
-        codeBuilder.addMethod(getModelHash(roundEnvironment));
-        codeBuilder.addMethod(getDefineModels(roundEnvironment));
         codeBuilder.addMethod(getMethodModelEqualsByClass(roundEnvironment));
+        codeBuilder.addMethod(getModelHash(roundEnvironment));
+        codeBuilder.addMethod(getModelHashByClass(roundEnvironment));
         JavaFile javaFile = JavaFile.builder("com.smilehacker.lego.factory", codeBuilder.build()).build();
         try {
             javaFile.writeTo(filer);
@@ -264,6 +265,23 @@ public class FileMaker {
         builder.addStatement("return 0d");
         builder.endControlFlow();
 
+        builder.addStatement("return getModelHash(m, m.getClass())");
+        return builder.build();
+    }
+
+    private MethodSpec getModelHashByClass(RoundEnvironment roundEnvironment) {
+        MethodSpec.Builder builder = MethodSpec.methodBuilder("getModelHash")
+                .addParameter(Object.class, "m")
+                .addParameter(Class.class, "clazz")
+                .addModifiers(Modifier.PUBLIC)
+                .addAnnotation(Override.class)
+                .returns(double.class);
+
+
+        builder.beginControlFlow("if (m == null)");
+        builder.addStatement("return 0d");
+        builder.endControlFlow();
+
         HashMap<TypeElement, List<VariableElement>> fieldMap = new HashMap<>();
         List<TypeElement> parents = new ArrayList<>();
         List<String> parentsName = new ArrayList<>();
@@ -290,9 +308,9 @@ public class FileMaker {
         for (TypeElement parent: parents) {
             if (!isGenerateIf) {
                 isGenerateIf = true;
-                builder.beginControlFlow("if ($T.class.equals(m.getClass()))", parent);
+                builder.beginControlFlow("if ($T.class.equals(clazz))", parent);
             } else {
-                builder.nextControlFlow("else if ($T.class.equals(m.getClass()))", parent);
+                builder.nextControlFlow("else if ($T.class.equals(clazz))", parent);
             }
             builder.addStatement("$T model = ($T) m", parent, parent);
             // body start
@@ -315,9 +333,9 @@ public class FileMaker {
                 } else {
                     String fieldClassName = ((TypeElement) mTypes.asElement(field.asType())).getQualifiedName().toString();
                     if (parentsName.contains(fieldClassName)) {
-                        builder.addStatement("hash += getModelHash(model.$N.hashCode())", field.getSimpleName());
+                        builder.addStatement("hash += getModelHash(model.$N)", field.getSimpleName());
                     } else {
-                        builder.addStatement("hash += model.$N.hashCode()", field.getSimpleName());
+                        builder.addStatement("hash += model.$N == null ? 12345 : model.$N.hashCode()", field.getSimpleName(), field.getSimpleName());
                     }
                 }
             }

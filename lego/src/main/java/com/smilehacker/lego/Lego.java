@@ -6,10 +6,8 @@ import android.util.Log;
 import java.lang.reflect.Constructor;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Created by zhouquan on 17/8/16.
@@ -20,7 +18,6 @@ public final class Lego {
 
     private static List<ILegoFactory> mLegoFactories = new LinkedList<>();
     private static List<Class> mLegoClasses = new LinkedList<>();
-    private static Map<Class, List<Class>> mLegoInheritanceMap  = new HashMap<>();
 
     static {
         Class factoryClass;
@@ -51,7 +48,6 @@ public final class Lego {
     }
 
 
-
     public static void addFactory(Class<? extends ILegoFactory> factoryClazz) {
         try {
             if (!mLegoFactories.contains(factoryClazz)) {
@@ -72,14 +68,9 @@ public final class Lego {
                 clazz = model.getClass();
             }
             for (ILegoFactory legoFactory: mLegoFactories) {
-                Object index = legoFactory.getModelIndex(model, clazz);
-                if (index != null) {
-                    return index;
+                if (contain(legoFactory.getDefineModels(), clazz)) {
+                    return legoFactory.getModelIndex(model, clazz);
                 }
-            }
-            Class superClass = clazz.getSuperclass();
-            if (superClass != null) {
-                return getModelIndex(model, superClass);
             }
             return null;
         }
@@ -87,16 +78,16 @@ public final class Lego {
         @Override
         public boolean isModelEquals(Object model0, Object model1) {
             for (ILegoFactory legoFactory: mLegoFactories) {
-                if (contain(legoFactory.getDefineModels(), model0)) {
+                if (contain(legoFactory.getDefineModels(), model0.getClass())) {
                     return legoFactory.isModelEquals(model0, model1);
                 }
             }
             return false;
         }
 
-        private boolean contain(Class[] classes, Object obj) {
+        private boolean contain(Class[] classes, Class objClass) {
             for (Class clazz : classes) {
-                if (clazz.equals(obj.getClass())) {
+                if (clazz.equals(objClass)) {
                     return true;
                 }
             }
@@ -106,7 +97,7 @@ public final class Lego {
         @Override
         public boolean isModelEquals(Object model0, Object model1, Class clazz) {
             for (ILegoFactory legoFactory: mLegoFactories) {
-                if (contain(legoFactory.getDefineModels(), model0)) {
+                if (contain(legoFactory.getDefineModels(), clazz)) {
                     return legoFactory.isModelEquals(model0, model1, clazz);
                 }
             }
@@ -116,12 +107,21 @@ public final class Lego {
         @Override
         public double getModelHash(Object m) {
             for (ILegoFactory legoFactory: mLegoFactories) {
-                double r = legoFactory.getModelHash(m);
-                if (r != -1) {
-                    return r;
+                if (contain(legoFactory.getDefineModels(), m.getClass())) {
+                    return legoFactory.getModelHash(m);
                 }
             }
-            return 0;
+            return -1;
+        }
+
+        @Override
+        public double getModelHash(Object m, Class clazz) {
+            for (ILegoFactory legoFactory: mLegoFactories) {
+                if (contain(legoFactory.getDefineModels(), clazz)) {
+                    return legoFactory.getModelHash(m, clazz);
+                }
+            }
+            return -1;
         }
 
         @Override
@@ -132,17 +132,18 @@ public final class Lego {
     };
 
     // todo 添加继承cache  diffhash添加继承判断
-    public static boolean isModelEqualsExtend(@NonNull Object model0, @NonNull Object model1) {
+    public static boolean isModelEqualsInheritance(@NonNull Object model0, @NonNull Object model1) {
         if (!model0.getClass().equals(model1.getClass())) {
             return false;
         }
         Class modelClass = model0.getClass();
         int index = mLegoClasses.indexOf(modelClass);
-        Log.d("clazz", "index = " + index);
+        if (index < 0) {
+            return false;
+        }
         for (int i = index, len = mLegoClasses.size(); i < len; i++) {
             Class clazz = mLegoClasses.get(i);
             if (clazz.isAssignableFrom(modelClass)) {
-                Log.d("lego", "check " + model0.getClass() + " == " + clazz);
                 if (!legoFactoryProxy.isModelEquals(model0, model1, clazz)) {
                     return false;
                 }
@@ -150,4 +151,42 @@ public final class Lego {
         }
         return true;
     }
+
+    public static double getModelHashWithInheritance(@NonNull Object model) {
+        Class modelClass = model.getClass();
+        int index = mLegoClasses.indexOf(modelClass);
+        if (index < 0) {
+            return -1;
+        }
+        double hash = -1;
+        for (int i = index, len = mLegoClasses.size(); i < len; i++) {
+            Class clazz = mLegoClasses.get(i);
+            if (clazz.isAssignableFrom(modelClass)) {
+                hash += legoFactoryProxy.getModelHash(model, clazz);
+            }
+        }
+        return hash;
+    }
+
+    public static Object getModelIndexInheritance(Object model) {
+        Class  modelClass = model.getClass();
+        int pos = mLegoClasses.indexOf(modelClass);
+        if (pos < 0) {
+            return null;
+        }
+        for (int i = pos, len = mLegoClasses.size(); i < len; i++) {
+            Class clazz = mLegoClasses.get(i);
+            Log.d("lego", "index check " + clazz);
+            if (clazz.isAssignableFrom(modelClass)) {
+                Object index = legoFactoryProxy.getModelIndex(model, clazz);
+                if (index != null) {
+                    Log.d("lego", "index check find " + index);
+                    return index;
+                }
+            }
+        }
+        return null;
+
+    }
+
 }
