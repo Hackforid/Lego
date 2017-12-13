@@ -8,6 +8,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.WeakHashMap;
 
 /**
  * Created by zhouquan on 17/8/16.
@@ -18,6 +19,8 @@ public final class Lego {
 
     private static List<ILegoFactory> mLegoFactories = new LinkedList<>();
     private static List<Class> mLegoClasses = new LinkedList<>();
+
+    protected static WeakHashMap<Object, Boolean> mModelMap = new WeakHashMap<>();
 
     static {
         Class factoryClass;
@@ -189,4 +192,7 @@ public final class Lego {
 
     }
 
+    public static void modelChanged(Object model) {
+        mModelMap.put(model, true);
+    }
 }
