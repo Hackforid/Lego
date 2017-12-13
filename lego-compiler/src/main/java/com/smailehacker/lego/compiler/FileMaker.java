@@ -327,9 +327,9 @@ public class FileMaker {
                 if ("int".equals(type) || "float".equals(type) || "double".equals(type)
                         || "short".equals(type) || "long".equals(type) || "byte".equals(type)
                         || "char".equals(type)) {
-                    builder.addStatement("hash += model.$N", field.getSimpleName());
+                    builder.addStatement("hash += model.$N * 1000", field.getSimpleName());
                 } else if ("boolean".equals(type)) {
-                    builder.addStatement("hash += model.$N ? 2 : 1", field.getSimpleName());
+                    builder.addStatement("hash += model.$N ? 2335: 1214", field.getSimpleName());
                 } else {
                     String fieldClassName = ((TypeElement) mTypes.asElement(field.asType())).getQualifiedName().toString();
                     if (parentsName.contains(fieldClassName)) {

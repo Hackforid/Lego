@@ -177,9 +177,11 @@ public class LegoAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
         public void setNewModels(List<Object> models) {
             mNewModels = models;
-            for (Object model : models) {
-                if (mModelHashMap.get(model) == null) {
-                    mModelHashMap.put(model, Lego.legoFactoryProxy.getModelHash(model));
+            if (mDiffModelHashEnabled) {
+                for (Object model : models) {
+                    if (mModelHashMap.get(model) == null) {
+                        mModelHashMap.put(model, Lego.legoFactoryProxy.getModelHash(model));
+                    }
                 }
             }
         }
