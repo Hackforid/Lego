@@ -364,6 +364,15 @@ public class FileMaker {
 
 
         Set<TypeElement> parents = new HashSet<>();
+        for (Element annotatedElement: roundEnvironment.getElementsAnnotatedWith(LegoIndex.class)) {
+            if (annotatedElement.getKind() != ElementKind.FIELD) {
+                error(annotatedElement, "Only field can be annotated with @%s", LegoIndex.class.getSimpleName());
+                return null;
+            }
+            VariableElement element = (VariableElement) annotatedElement;
+            TypeElement parent = (TypeElement) element.getEnclosingElement();
+            parents.add(parent);
+        }
         for (Element annotatedElement: roundEnvironment.getElementsAnnotatedWith(LegoField.class)) {
             if (annotatedElement.getKind() != ElementKind.FIELD) {
                 error(annotatedElement, "Only field can be annotated with @%s", LegoField.class.getSimpleName());
