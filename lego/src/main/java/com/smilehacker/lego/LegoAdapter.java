@@ -205,6 +205,9 @@ public class LegoAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         public boolean areItemsTheSame(int oldItemPosition, int newItemPosition) {
             Object oldModel = mOldModels.get(oldItemPosition);
             Object newModel = mNewModels.get(newItemPosition);
+            if (oldModel == newModel) {
+                return true;
+            }
             Object oldIndex = mDiffInheritance ? Lego.getModelIndexInheritance(oldModel) : Lego.legoFactoryProxy.getModelIndex(oldModel, null);
             Object newIndex = mDiffInheritance ? Lego.getModelIndexInheritance(newModel) : Lego.legoFactoryProxy.getModelIndex(newModel, null);
             if (oldIndex != null && newIndex != null && oldIndex.equals(newIndex)) {
