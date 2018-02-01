@@ -208,8 +208,8 @@ public class FileMaker {
                     builder.beginControlFlow("if (!isModelEquals(m0.get(i), m1.get(i)))");
                         builder.addStatement("return false");
                     builder.endControlFlow();
-                    builder.addStatement("return true");
                 builder.endControlFlow();
+                builder.addStatement("return true");
             builder.endControlFlow();
         builder.endControlFlow();
 
@@ -223,8 +223,8 @@ public class FileMaker {
                     builder.beginControlFlow("if (!isModelEquals($T.get(model0, i), $T.get(model1, i)))", Array.class, Array.class);
                         builder.addStatement("return false");
                     builder.endControlFlow();
-                    builder.addStatement("return true");
                 builder.endControlFlow();
+                builder.addStatement("return true");
             builder.endControlFlow();
         builder.endControlFlow();
 
