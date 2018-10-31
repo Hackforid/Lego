@@ -267,6 +267,14 @@ public class LegoAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         }
     }
 
+    public LegoComponent getComponentByHolder(RecyclerView.ViewHolder holder) {
+        for (LegoComponent component : mComponents) {
+            if (holder.getClass().equals(component.getHolderClass())) {
+                return component;
+            }
+        }
+        return null;
+    }
 
     public LegoComponent getComponentByModel(Object model) {
         for (LegoComponent component: mComponents) {
