@@ -45,6 +45,12 @@ public abstract class LegoComponent<V extends RecyclerView.ViewHolder, M> {
         onBindData(viewHolder, model);
     }
 
+    public void onAttached(V holder) {
+    }
+
+    public void onDetached(V holder) {
+    }
+
     public int getViewType() {
         return this.getClass().hashCode();
     }

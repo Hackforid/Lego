@@ -129,6 +129,26 @@ public class LegoAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         viewModel.onBindData(holder, model, payloads);
     }
 
+    @Override
+    public void onViewAttachedToWindow(@NonNull RecyclerView.ViewHolder holder) {
+        super.onViewAttachedToWindow(holder);
+        LegoComponent component = getComponentByHolder(holder);
+        if (component != null) {
+            //noinspection unchecked
+            component.onAttached(holder);
+        }
+    }
+
+    @Override
+    public void onViewDetachedFromWindow(@NonNull RecyclerView.ViewHolder holder) {
+        LegoComponent component = getComponentByHolder(holder);
+        if (component != null) {
+            //noinspection unchecked
+            component.onDetached(holder);
+        }
+        super.onViewDetachedFromWindow(holder);
+    }
+
     @NonNull
     private LegoComponent getViewModelByModel(Object dataModel) {
         for (LegoComponent component : mComponents) {
