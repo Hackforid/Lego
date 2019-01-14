@@ -4,9 +4,18 @@ apply plugin: 'com.github.dcendents.android-maven'
 group='com.github.Hackforid'
 
 dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
-    compile project(":annotation")
-    compile "com.google.auto.service:auto-service:1.0-rc3"
-    compile 'com.squareup:javapoet:1.9.0'
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation project(":annotation")
+    implementation "com.google.auto.service:auto-service:1.0-rc4"
+    implementation 'com.squareup:javapoet:1.10.0'
+}
+
+task sourcesJar(type: Jar) {
+    classifier = 'sources'
+    from sourceSets.main.allJava
+}
+
+artifacts {
+    archives sourcesJar
 }
 
