@@ -46,5 +46,12 @@ public class Item1Component extends LegoComponent<Item1Component.ViewHolder, Ite
 
         @LegoIndex
         public String title;
+
+        public Model(String title) {
+            this.title = title;
+        }
+
+        public Model() {
+        }
     }
 }

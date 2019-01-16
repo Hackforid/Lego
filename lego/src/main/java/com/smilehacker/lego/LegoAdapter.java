@@ -270,10 +270,11 @@ public class LegoAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     public LegoComponent getComponentByModel(Object model) {
         for (LegoComponent component: mComponents) {
-            if (model.getClass().equals(component.getClass())) {
+            if (model.getClass().equals(component.getModelClass())) {
                 return component;
             }
         }
         return null;
     }
+
 }
