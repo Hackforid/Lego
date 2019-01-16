@@ -7,8 +7,8 @@ android {
         applicationId "com.smilehacker.lego"
         minSdkVersion 15
         targetSdkVersion 26
-        versionCode 1
-        versionName "1.0"
+        versionCode project.legoVersionCode
+        versionName project.legoVersion
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         javaCompileOptions {
             annotationProcessorOptions {

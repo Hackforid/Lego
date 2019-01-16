@@ -9,8 +9,8 @@ android {
     defaultConfig {
         minSdkVersion 14
         targetSdkVersion 26
-        versionCode 3
-        versionName "0.2.4"
+        versionCode project.legoVersionCode
+        versionName project.legoVersion
 
     }
     buildTypes {

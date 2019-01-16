@@ -24,6 +24,9 @@ allprojects {
     }
 }
 
+ext.legoVersion = "0.7.0"
+ext.legoVersionCode = 100
+
 task clean(type: Delete) {
     delete rootProject.buildDir
 }
