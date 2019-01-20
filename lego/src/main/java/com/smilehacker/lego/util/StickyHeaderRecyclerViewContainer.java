@@ -1,12 +1,17 @@
 package com.smilehacker.lego.util;
 
 import android.content.Context;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.util.SparseArray;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
+
+import com.smilehacker.lego.Lego;
+import com.smilehacker.lego.LegoAdapter;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -17,7 +22,7 @@ import java.util.List;
 
 public class StickyHeaderRecyclerViewContainer extends FrameLayout {
 
-    public static final String TAG = StickyHeaderRecyclerViewContainer.class.getSimpleName();
+    public static final String TAG = "StickyHeader";
     private final static int NO_POSITION = -100;
 
     private RecyclerView mRecyclerView;
@@ -113,6 +118,19 @@ public class StickyHeaderRecyclerViewContainer extends FrameLayout {
     }
 
     public void refresh() {
+        if (isLayoutRequested()) {
+            this.post(new Runnable() {
+                @Override
+                public void run() {
+                    refreshDirectly();
+                }
+            });
+        } else {
+            refreshDirectly();
+        }
+    }
+
+    private void refreshDirectly() {
         View header = getHeaderView(mRecyclerView);
         if (header == null) {
             mCurrentHeaderPos = NO_POSITION;
@@ -161,6 +179,8 @@ public class StickyHeaderRecyclerViewContainer extends FrameLayout {
         return isHeader(adapter.getItemViewType(position));
     }
 
+    private Object mLastHeaderModelIndex;
+
     private View getHeaderView(RecyclerView parent) {
         RecyclerView.LayoutManager layoutManager = parent.getLayoutManager();
         RecyclerView.Adapter adapter = parent.getAdapter();
@@ -168,8 +188,13 @@ public class StickyHeaderRecyclerViewContainer extends FrameLayout {
             return null;
         }
 
-        int firstVisibleItemPos = ((RecyclerView.LayoutParams) layoutManager.getChildAt(0)
-                .getLayoutParams()).getViewAdapterPosition(); // 这方式好屌
+        int firstVisibleItemPos = -1;
+        if (layoutManager instanceof LinearLayoutManager) {
+            firstVisibleItemPos = ((LinearLayoutManager) layoutManager).findFirstVisibleItemPosition();
+        } else {
+            firstVisibleItemPos = ((RecyclerView.LayoutParams) layoutManager.getChildAt(0)
+                    .getLayoutParams()).getViewAdapterPosition();
+        }
 
         int headerPos = findStickyHeaderPosition(parent, firstVisibleItemPos);
 
@@ -177,13 +202,26 @@ public class StickyHeaderRecyclerViewContainer extends FrameLayout {
             return null;
         }
 
-        if (headerPos == mCurrentHeaderPos && mCurrentHeaderView != null) {
+
+        boolean headerDataChanged = false;
+        if (mAdapter instanceof LegoAdapter) {
+            try {
+                Object model = ((LegoAdapter) mAdapter).getData().get(headerPos);
+                Object currentIndex = Lego.legoFactoryProxy.getModelIndex(model, model.getClass());
+                headerDataChanged = !currentIndex.equals(mLastHeaderModelIndex);
+                mLastHeaderModelIndex = currentIndex;
+            } catch (Exception e) {
+                Log.e(TAG, "", e);
+            }
+        }
+
+        if (headerPos == mCurrentHeaderPos && mCurrentHeaderView != null && !headerDataChanged) {
             return mCurrentHeaderView;
         }
 
         mCurrentHeaderPos = headerPos;
-        int viewType = adapter.getItemViewType(headerPos);
 
+        int viewType = adapter.getItemViewType(headerPos);
         RecyclerView.ViewHolder viewHolder = mCachedHeaderViewHolders.get(viewType);
         if (viewHolder == null) {
             viewHolder = adapter.createViewHolder(parent, viewType);
@@ -229,7 +267,7 @@ public class StickyHeaderRecyclerViewContainer extends FrameLayout {
             return RecyclerView.NO_POSITION;
         }
 
-        for (int i = fromPos; i >=0; i--) {
+        for (int i = fromPos; i >= 0; i--) {
             int viewType = adapter.getItemViewType(i);
             if (isHeader(viewType)) {
                 return i;
