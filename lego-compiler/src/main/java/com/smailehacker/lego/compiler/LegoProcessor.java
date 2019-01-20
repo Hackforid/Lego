@@ -1,6 +1,5 @@
 package com.smailehacker.lego.compiler;
 
-import com.google.auto.service.AutoService;
 import com.smilehacker.lego.annotation.Component;
 import com.smilehacker.lego.annotation.LegoField;
 import com.smilehacker.lego.annotation.LegoIndex;
@@ -12,7 +11,6 @@ import javax.annotation.processing.AbstractProcessor;
 import javax.annotation.processing.Filer;
 import javax.annotation.processing.Messager;
 import javax.annotation.processing.ProcessingEnvironment;
-import javax.annotation.processing.Processor;
 import javax.annotation.processing.RoundEnvironment;
 import javax.lang.model.SourceVersion;
 import javax.lang.model.element.Element;
@@ -21,7 +19,6 @@ import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
 import javax.tools.Diagnostic;
 
-@AutoService(Processor.class)
 public class LegoProcessor extends AbstractProcessor {
 
     private Types typeUtils;
