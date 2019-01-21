@@ -1,5 +1,9 @@
 #!/usr/bin/env bash
 
+# fix JitPack's compile bug
+yes | $ANDROID_HOME/tools/bin/sdkmanager "platforms;android-28"
+yes | $ANDROID_HOME/tools/bin/sdkmanager "build-tools;28.0.3"
+
 ##############################################################################
 ##
 ##  Gradle start up script for UN*X
@@ -159,6 +163,3 @@ JVM_OPTS[${#JVM_OPTS[*]}]="-Dorg.gradle.appname=$APP_BASE_NAME"
 
 exec "$JAVACMD" "${JVM_OPTS[@]}" -classpath "$CLASSPATH" org.gradle.wrapper.GradleWrapperMain "$@"
 
-# fix JitPack's compile bug
-yes | $ANDROID_HOME/tools/bin/sdkmanager "platforms;android-28"
-yes | $ANDROID_HOME/tools/bin/sdkmanager "build-tools;28.0.2"
