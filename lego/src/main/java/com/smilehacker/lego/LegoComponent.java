@@ -18,6 +18,7 @@ public abstract class LegoComponent<V extends RecyclerView.ViewHolder, M> {
 
     public abstract void onBindData(@NonNull V viewHolder, @NonNull M model);
 
+    private Class mHolderClass;
     private Class mModelClass;
 
     /**
@@ -44,12 +45,25 @@ public abstract class LegoComponent<V extends RecyclerView.ViewHolder, M> {
         onBindData(viewHolder, model);
     }
 
+    public void onAttached(V holder) {
+    }
+
+    public void onDetached(V holder) {
+    }
+
     public int getViewType() {
         return this.getClass().hashCode();
     }
 
     public Object getChangePayload(@NonNull M oldModel, @NonNull M newModel) {
         return null;
+    }
+
+    public Class getHolderClass() {
+        if (mHolderClass == null) {
+            mHolderClass = LegoComponentManager.getInstance().getHolder(this);
+        }
+        return mHolderClass;
     }
 
     public Class getModelClass() {
